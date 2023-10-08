@@ -13,37 +13,37 @@ import com.discord.api.permission.PermissionOverwrite
  * update if method names change after an update
  */
 @Suppress("unused")
-class PermissionOverwriteWrapper(private val overwrite: PermissionOverwrite) {
+public class PermissionOverwriteWrapper(private val overwrite: PermissionOverwrite) {
     /** Returns the raw (obfuscated) [PermissionOverwrite] Object associated with this wrapper */
-    fun raw(): PermissionOverwrite = overwrite
+    public fun raw(): PermissionOverwrite = overwrite
 
-    val id
+    public val id: Long
         get() = overwrite.id
 
-    val allowed
+    public val allowed: Long
         get() = overwrite.allowed
 
-    val denied
+    public val denied: Long
         get() = overwrite.denied
 
-    val type
+    public val type: PermissionOverwrite.Type
         get() = overwrite.type
 
-    companion object {
+    public companion object {
         @JvmStatic
-        val PermissionOverwrite.id
+        public val PermissionOverwrite.id: Long
             get() = a()
 
         @JvmStatic
-        val PermissionOverwrite.allowed
+        public val PermissionOverwrite.allowed: Long
             get() = c()
 
         @JvmStatic
-        val PermissionOverwrite.denied
+        public val PermissionOverwrite.denied: Long
             get() = d()
 
         @JvmStatic
-        val PermissionOverwrite.type: PermissionOverwrite.Type
+        public val PermissionOverwrite.type: PermissionOverwrite.Type
             get() = f()
     }
 }

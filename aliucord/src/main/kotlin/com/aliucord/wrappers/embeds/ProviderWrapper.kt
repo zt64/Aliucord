@@ -12,23 +12,23 @@ import com.discord.api.message.embed.EmbedProvider
  * Wraps the obfuscated [EmbedProvider] class to provide nice method names and require only one central
  * update if method names change after an update
  */
-class ProviderWrapper(private val provider: EmbedProvider) {
+public class ProviderWrapper(private val provider: EmbedProvider) {
     /** Returns the raw (obfuscated) [EmbedProvider] Object associated with this wrapper */
-    fun raw() = provider
+    public fun raw(): EmbedProvider = provider
 
-    val name
+    public val name: String
         get() = provider.name
 
-    val url
+    public val url: String?
         get() = provider.url
 
-    companion object {
+    public companion object {
         @JvmStatic
-        val EmbedProvider.name: String
+        public val EmbedProvider.name: String
             get() = a()
 
         @JvmStatic
-        val EmbedProvider.url: String?
+        public val EmbedProvider.url: String?
             get() = b()
     }
 }

@@ -14,25 +14,25 @@ import com.discord.api.message.embed.EmbedField
  */
 public class FieldWrapper(private val field: EmbedField) {
     /** Returns the raw (obfuscated) [EmbedField] Object associated with this wrapper  */
-    fun raw() = field
+    public fun raw(): EmbedField = field
 
-    val name
+    public val name
         get() = field.name
 
     public val value
         get() = field.value
 
     @get:JvmName("isInline")
-    val inline
+    public val inline
         get() = field.inline
 
-    companion object {
+    public companion object {
         @JvmStatic
-        val EmbedField.name: String
+        public val EmbedField.name: String
             get() = a()
 
         @JvmStatic
-        val EmbedField.value: String
+        public val EmbedField.value: String
             get() = b()
 
         private val inlineField =
@@ -40,7 +40,7 @@ public class FieldWrapper(private val field: EmbedField) {
 
         @JvmStatic
         @get:JvmName("isInline")
-        val EmbedField.inline
+        public val EmbedField.inline: Boolean
             get() = inlineField[this] as Boolean? == java.lang.Boolean.TRUE
     }
 }

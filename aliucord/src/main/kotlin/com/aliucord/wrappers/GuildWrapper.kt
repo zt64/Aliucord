@@ -23,69 +23,69 @@ import com.discord.api.sticker.Sticker
 @Suppress("unused")
 public class GuildWrapper(private val guild: Guild) {
     /** Returns the raw (obfuscated) [Guild] Object associated with this wrapper */
-    public fun raw() = guild
+    public fun raw(): Guild = guild
 
-    public val afkChannelId
+    public val afkChannelId: Long?
         get() = guild.afkChannelId
 
-    public val afkTimeout
+    public val afkTimeout: Int
         get() = guild.afkTimeout
 
-    public val approximatePresenceCount
+    public val approximatePresenceCount: Int
         get() = guild.approximatePresenceCount
 
-    public val banner
+    public val banner: String?
         get() = guild.banner
 
-    public val channelUpdates
+    public val channelUpdates: List<Channel>
         get() = guild.channelUpdates
 
-    public val channels
+    public val channels: List<Channel>
         get() = guild.channels
 
-    public val defaultMessageNotifications
+    public val defaultMessageNotifications: Int?
         get() = guild.defaultMessageNotifications
 
-    public val description
+    public val description: String?
         get() = guild.description
 
-    public val emojis
+    public val emojis: List<GuildEmoji>
         get() = guild.emojis
 
-    public val explicitContentFilter
+    public val explicitContentFilter: GuildExplicitContentFilter?
         get() = guild.explicitContentFilter
 
-    public val features
+    public val features: List<GuildFeature>
         get() = guild.features
 
-    public val guildHashes
+    public val guildHashes: GuildHashes
         get() = guild.hashes
 
-    public val scheduledEvents
+    public val scheduledEvents: List<GuildScheduledEvent>
         get() = guild.scheduledEvents
 
-    public val icon
+    public val icon: String?
         get() = guild.icon
 
-    public val id
+    public val id: Long
         get() = guild.id
 
-    public val joinedAt
+    public val joinedAt: String?
         get() = guild.joinedAt
 
     public val maxVideoChannelUsers: GuildMaxVideoChannelUsers?
         get() = guild.maxVideoChannelUsers
 
-    public val approxMemberCount
+    public val approxMemberCount: Int
         get() = guild.approxMemberCount
 
-    public val cachedMembers
+    public val cachedMembers: List<GuildMember>
         get() = guild.cachedMembers
 
-    public val mfaLevel
+    public val mfaLevel: Int
         get() = guild.mfaLevel
 
-    public val name
+    public val name: String
         get() = guild.name
 
     @get:JvmName("isNsfw")

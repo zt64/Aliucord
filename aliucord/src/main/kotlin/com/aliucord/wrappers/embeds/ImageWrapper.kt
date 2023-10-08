@@ -13,37 +13,37 @@ import com.discord.api.message.embed.EmbedImage
  * update if method names change after an update
  */
 @Suppress("unused")
-class ImageWrapper(private val image: EmbedImage) {
+public class ImageWrapper(private val image: EmbedImage) {
     /** Returns the raw (obfuscated) [EmbedImage] Object associated with this wrapper */
-    fun raw() = image
+    public fun raw(): EmbedImage = image
 
-    val url
+    public val url: String
         get() = image.url
 
-    val proxyUrl
+    public val proxyUrl: String
         get() = image.proxyUrl
 
-    val height
+    public val height: Int?
         get() = image.height
 
-    val width
+    public val width: Int?
         get() = image.width
 
-    companion object {
+    public companion object {
         @JvmStatic
-        val EmbedImage.url: String
+        public val EmbedImage.url: String
             get() = c()
 
         @JvmStatic
-        val EmbedImage.proxyUrl: String
+        public val EmbedImage.proxyUrl: String
             get() = b()
 
         @JvmStatic
-        val EmbedImage.height: Int?
+        public val EmbedImage.height: Int?
             get() = a()
 
         @JvmStatic
-        val EmbedImage.width: Int?
+        public val EmbedImage.width: Int?
             get() = d()
     }
 }

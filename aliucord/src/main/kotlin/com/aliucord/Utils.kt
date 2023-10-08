@@ -180,8 +180,8 @@ public object Utils {
     public fun launchFileExplorer(folder: File) {
         val path = folder.absolutePath
 
-        if (!folder.exists()) throw IllegalArgumentException("No such folder: $path")
-        if (!folder.isDirectory) throw IllegalArgumentException("Not a folder: $path")
+        require(folder.exists()) { "No such folder: $path" }
+        require(folder.isDirectory) { "Not a folder: $path" }
 
         val uri = Uri.parse(path)
         val intent = Intent(Intent.ACTION_VIEW)
@@ -189,6 +189,7 @@ public object Utils {
 
         // TODO: Do we need to add query permission to AndroidManifest? I tried on Android 11 and it resolved MiXplorer correctly
         @Suppress("QueryPermissionsNeeded")
+
         if (intent.resolveActivityInfo(appActivity.packageManager, 0) == null) {
             ConfirmDialog()
                 .setTitle(":(")
@@ -205,7 +206,7 @@ public object Utils {
      * @param text The actual text
      */
     @JvmStatic
-    public fun setClipboard(label: CharSequence, text: CharSequence) {
+    public fun setClipboard(label: CharSequence?, text: CharSequence) {
         val clipboard = appContext.getSystemService<ClipboardManager>()!!
         clipboard.setPrimaryClip(ClipData.newPlainText(label, text))
     }

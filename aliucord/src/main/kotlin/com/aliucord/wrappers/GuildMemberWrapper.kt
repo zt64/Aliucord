@@ -16,93 +16,93 @@ import com.discord.api.utcdatetime.UtcDateTime
  * update if method names change after an update
  */
 @Suppress("unused")
-class GuildMemberWrapper(private val guildMember: GuildMember) {
+public class GuildMemberWrapper(private val guildMember: GuildMember) {
     /** Returns the raw (obfuscated) [GuildMember] Object associated with this wrapper */
-    public fun raw() = guildMember
+    public fun raw(): GuildMember = guildMember
 
-    public val avatar
+    public val avatar: String?
         get() = guildMember.avatar
 
-    public val banner
+    public val banner: String?
         get() = guildMember.banner
 
-    public val bio
+    public val bio: String?
         get() = guildMember.bio
 
     public val guildId: UtcDateTime
         get() = guildMember.guildId
 
-    public val joinedAt
+    public val joinedAt: UtcDateTime?
         get() = guildMember.joinedAt
 
-    public val nick
+    public val nick: String?
         get() = guildMember.nick
 
-    public val isPending
+    public val isPending: Boolean
         get() = guildMember.isPending
 
-    public val premiumSince
+    public val premiumSince: String?
         get() = guildMember.premiumSince
 
-    public val presence
+    public val presence: Presence?
         get() = guildMember.presence
 
-    public val roles
+    public val roles: List<Long>
         get() = guildMember.roles
 
-    public val user
+    public val user: User?
         get() = guildMember.user
 
-    val userId
+    public val userId: Long?
         get() = guildMember.userId
 
-    companion object {
+    public companion object {
         @JvmStatic
-        val GuildMember.avatar: String?
+        public val GuildMember.avatar: String?
             get() = b()
 
         @JvmStatic
-        val GuildMember.banner: String?
+        public val GuildMember.banner: String?
             get() = c()
 
         @JvmStatic
-        val GuildMember.bio: String?
+        public val GuildMember.bio: String?
             get() = d()
 
         @JvmStatic
-        val GuildMember.guildId
+        public val GuildMember.guildId: UtcDateTime
             get() = e()
 
         @JvmStatic
-        val GuildMember.joinedAt: UtcDateTime?
+        public val GuildMember.joinedAt: UtcDateTime?
             get() = g()
 
         @JvmStatic
-        val GuildMember.nick: String?
+        public val GuildMember.nick: String?
             get() = h()
 
         @JvmStatic
-        val GuildMember.isPending
+        public val GuildMember.isPending: Boolean
             get() = i()
 
         @JvmStatic
-        val GuildMember.premiumSince: String?
+        public val GuildMember.premiumSince: String?
             get() = j()
 
         @JvmStatic
-        val GuildMember.presence: Presence?
+        public val GuildMember.presence: Presence?
             get() = k()
 
         @JvmStatic
-        val GuildMember.roles: List<Long>
+        public val GuildMember.roles: List<Long>
             get() = l()
 
         @JvmStatic
-        val GuildMember.user: User?
+        public val GuildMember.user: User?
             get() = m()
 
         @JvmStatic
-        val GuildMember.userId: Long?
+        public val GuildMember.userId: Long?
             get() = n()
     }
 }

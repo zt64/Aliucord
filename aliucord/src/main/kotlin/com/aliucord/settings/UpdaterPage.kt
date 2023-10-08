@@ -111,6 +111,7 @@ internal class UpdaterPage : SettingsPage() {
                 .setActionTextColor(Color.BLACK)
                 .show()
         }
+
         addHeaderButton(
             "Refresh",
             tintToTheme(getDrawableByAttr(context, R.b.ic_refresh))
@@ -126,6 +127,7 @@ internal class UpdaterPage : SettingsPage() {
             }
             true
         }
+
         addHeaderButton("Update All", R.e.ic_file_download_white_24dp) { item ->
             item.isEnabled = false
             setActionBarSubtitle("Updating...")
@@ -140,6 +142,7 @@ internal class UpdaterPage : SettingsPage() {
             }
             true
         }
+
         val updateCount = PluginUpdater.updates
         if (updateCount.isEmpty()) {
             val state = TextView(context, null, 0, R.i.UiKit_Settings_Item_SubText).apply {
@@ -149,9 +152,11 @@ internal class UpdaterPage : SettingsPage() {
             }
             return addView(state)
         }
+
         stateText = "Found ${pluralise(updateCount.size, "update")}"
         setActionBarSubtitle(stateText)
-        for (plugin in PluginUpdater.updates) {
+
+        PluginUpdater.updates.forEach { plugin ->
             addView(UpdaterPluginCard(context, plugin, ::reRender))
         }
     }

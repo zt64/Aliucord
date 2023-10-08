@@ -16,7 +16,7 @@ import com.discord.api.utcdatetime.UtcDateTime
 @Suppress("unused")
 public class MessageEmbedWrapper(private val embed: MessageEmbed) {
     /** Returns the raw (obfuscated) [MessageEmbed] Object associated with this wrapper */
-    public fun raw() = embed
+    public fun raw(): MessageEmbed = embed
 
     public val author: AuthorWrapper?
         get() = getAuthor(embed)
@@ -52,34 +52,34 @@ public class MessageEmbedWrapper(private val embed: MessageEmbed) {
     public val rawThumbnail: EmbedThumbnail?
         get() = embed.rawThumbnail
 
-    public val image
+    public val image: ImageWrapper?
         get() = getImage(embed)
 
     /** Returns the raw (obfuscated) [EmbedImage] Object associated with this wrapper */
-    public val rawImage
+    public val rawImage: EmbedImage?
         get() = embed.rawImage
 
-    public val video
+    public val video: VideoWrapper?
         get() = getVideo(embed)
 
     /** Returns the raw (obfuscated) [EmbedVideo] Object associated with this wrapper */
-    public val rawVideo
+    public val rawVideo: EmbedVideo?
         get() = embed.rawVideo
 
     public val provider: ProviderWrapper?
         get() = getProvider(embed)
 
     /** Returns the raw (obfuscated) [EmbedProvider] Object associated with this wrapper */
-    public val rawProvider
+    public val rawProvider: EmbedProvider?
         get() = embed.rawProvider
 
-    public val timestamp
+    public val timestamp: UtcDateTime?
         get() = embed.timestamp
 
-    public val title
+    public val title: String?
         get() = embed.title
 
-    public val type
+    public val type: EmbedType
         get() = embed.type
 
     public val url: String?

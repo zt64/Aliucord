@@ -15,28 +15,28 @@ import com.discord.api.message.embed.EmbedAuthor
 @Suppress("unused")
 public class AuthorWrapper(private val author: EmbedAuthor) {
     /** Returns the raw (obfuscated) [EmbedAuthor] Object associated with this wrapper */
-    fun raw() = author
+    public fun raw(): EmbedAuthor = author
 
-    val name
+    public val name: String
         get() = author.name
 
-    val proxyIconUrl
+    public val proxyIconUrl: String?
         get() = author.proxyIconUrl
 
-    val url
+    public val url: String?
         get() = author.url
 
-    companion object {
+    public companion object {
         @JvmStatic
-        val EmbedAuthor.name: String
+        public val EmbedAuthor.name: String
             get() = a()
 
         @JvmStatic
-        val EmbedAuthor.proxyIconUrl: String?
+        public val EmbedAuthor.proxyIconUrl: String?
             get() = b()
 
         @JvmStatic
-        val EmbedAuthor.url: String?
+        public val EmbedAuthor.url: String?
             get() = c()
     }
 }

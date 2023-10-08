@@ -23,7 +23,7 @@ public object GatewayAPI {
         public operator fun invoke(eventData: T)
     }
 
-    public val eventListeners = mutableListOf<Triple<String, Class<*>, EventListener<Any>>>()
+    public val eventListeners: MutableList<Triple<String, Class<*>, EventListener<Any>>> = mutableListOf()
     private val rawListeners = mutableListOf<EventListener<String>>()
     private val socket by lazyField<StoreGatewayConnection>()
     private val logger = Logger("GatewayAPI")
@@ -84,7 +84,7 @@ public object GatewayAPI {
     @JvmStatic
     public fun onRawEvent(names: List<String>, listener: (rawEvent: String) -> Unit) {
         rawListeners += EventListener { eventData ->
-            val namesUpper = names.map { it.uppercase() }
+            val namesUpper = names.map(String::uppercase)
             val eventName = JSONObject(eventData).getString("t")
             if (eventName in namesUpper) listener(eventData)
         }

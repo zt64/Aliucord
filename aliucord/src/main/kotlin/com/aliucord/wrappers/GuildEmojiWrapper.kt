@@ -15,33 +15,33 @@ import com.discord.api.emoji.GuildEmoji
 @Suppress("unused")
 public class GuildEmojiWrapper(private val emoji: GuildEmoji) {
     /** Returns the raw (obfuscated) [GuildEmoji] Object associated with this wrapper */
-    fun raw() = emoji
+    public fun raw(): GuildEmoji = emoji
 
     @get:JvmName("isAnimated")
-    public val animated
+    public val animated: Boolean
         get() = emoji.animated
 
     @get:JvmName("isAvailable")
-    public val available
+    public val available: Boolean?
         get() = emoji.available
 
-    public val id
+    public val id: Long
         get() = emoji.id
 
     @get:JvmName("isManaged")
-    public val managed
+    public val managed: Boolean
         get() = emoji.managed
 
-    public val name
+    public val name: String
         get() = emoji.name
 
-    public val roles
+    public val roles: List<Long>
         get() = emoji.roles
 
-    companion object {
+    public companion object {
         @JvmStatic
         @get:JvmName("isAnimated")
-        public val GuildEmoji.animated
+        public val GuildEmoji.animated: Boolean
             get() = a()
 
         @JvmStatic
@@ -50,12 +50,12 @@ public class GuildEmojiWrapper(private val emoji: GuildEmoji) {
             get() = b()
 
         @JvmStatic
-        public val GuildEmoji.id
+        public val GuildEmoji.id: Long
             get() = c()
 
         @JvmStatic
         @get:JvmName("isManaged")
-        public val GuildEmoji.managed
+        public val GuildEmoji.managed: Boolean
             get() = d()
 
         @JvmStatic
@@ -63,7 +63,7 @@ public class GuildEmojiWrapper(private val emoji: GuildEmoji) {
             get() = e()
 
         @JvmStatic
-        public val GuildEmoji.requireColons
+        public val GuildEmoji.requireColons: Boolean
             get() = f()
 
         @JvmStatic

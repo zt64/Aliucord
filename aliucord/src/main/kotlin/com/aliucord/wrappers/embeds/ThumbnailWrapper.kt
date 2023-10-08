@@ -15,35 +15,35 @@ import com.discord.api.message.embed.EmbedThumbnail
 @Suppress("unused")
 public class ThumbnailWrapper(private val thumbnail: EmbedThumbnail) {
     /** Returns the raw (obfuscated) [EmbedThumbnail] Object associated with this wrapper */
-    fun raw() = thumbnail
+    public fun raw(): EmbedThumbnail = thumbnail
 
-    val url
+    public val url: String
         get() = thumbnail.url
 
-    val proxyUrl
+    public val proxyUrl: String
         get() = thumbnail.proxyUrl
 
-    val height
+    public val height: Int?
         get() = thumbnail.height
 
-    val width
+    public val width: Int?
         get() = thumbnail.width
 
-    companion object {
+    public companion object {
         @JvmStatic
-        val EmbedThumbnail.url: String
+        public val EmbedThumbnail.url: String
             get() = c()
 
         @JvmStatic
-        val EmbedThumbnail.proxyUrl: String
+        public val EmbedThumbnail.proxyUrl: String
             get() = b()
 
         @JvmStatic
-        val EmbedThumbnail.height: Int?
+        public val EmbedThumbnail.height: Int?
             get() = a()
 
         @JvmStatic
-        val EmbedThumbnail.width: Int?
+        public val EmbedThumbnail.width: Int?
             get() = d()
     }
 }

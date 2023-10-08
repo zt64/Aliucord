@@ -13,35 +13,35 @@ import com.discord.api.message.embed.EmbedFooter
  * update if method names change after an update
  */
 @Suppress("unused")
-class FooterWrapper(private val footer: EmbedFooter) {
+public class FooterWrapper(private val footer: EmbedFooter) {
     /** Returns the raw (obfuscated) [EmbedFooter] Object associated with this wrapper  */
-    fun raw() = footer
+    public fun raw(): EmbedFooter = footer
 
-    val text
+    public val text: String
         get() = footer.text
 
-    val iconUrl
+    public val iconUrl: String?
         get() = footer.iconUrl
 
-    val proxyIconUrl
+    public val proxyIconUrl: String?
         get() = footer.proxyIconUrl
 
-    companion object {
+    public companion object {
         @JvmStatic
-        val EmbedFooter.text: String
+        public val EmbedFooter.text: String
             get() = b()
 
         @JvmStatic
-        val EmbedFooter.proxyIconUrl: String?
+        public val EmbedFooter.proxyIconUrl: String?
             get() = a()
 
         // why is there no getter for this lol
         // FIXME: Do this without reflection once Discord adds getter
-        private val iconUrlField =
-            EmbedFooter::class.java.getDeclaredField("iconUrl").apply { isAccessible = true }
+        private val iconUrlField = EmbedFooter::class.java.getDeclaredField("iconUrl")
+            .apply { isAccessible = true }
 
         @JvmStatic
-        val EmbedFooter.iconUrl
+        public val EmbedFooter.iconUrl: String?
             get() = iconUrlField[this] as String?
     }
 }

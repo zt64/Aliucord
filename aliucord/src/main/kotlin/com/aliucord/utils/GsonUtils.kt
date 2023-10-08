@@ -67,6 +67,24 @@ public object GsonUtils {
     public fun <T> Gson.fromJson(json: String?, type: Type?): T = g(json, type)
 
     /**
+     * Serializes an Object to pretty printed JSON
+     * @param obj The object to serialize
+     * @return Serialized JSON
+     */
+    @JvmStatic
+    @Deprecated("Use kt extension for Gson", ReplaceWith("gsonPretty.toJson(obj)"))
+    public fun toJsonPretty(obj: Any?): String = gsonPretty.toJson(obj)
+
+    /**
+     * Serializes an Object to JSON
+     * @param obj The object to serialize
+     * @return Serialized JSON
+     */
+    @JvmStatic
+    @Deprecated("Use kt extension for Gson", ReplaceWith("gson.toJson(obj)"))
+    public fun toJson(obj: Any?): String = gson.toJson(obj)
+
+    /**
      * Serializes an Object to JSON
      * @param obj The object to serialize
      * @return Serialized JSON

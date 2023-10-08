@@ -8,7 +8,7 @@
 
 package com.aliucord
 
-import android.Manifest
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -17,9 +17,7 @@ import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AppCompatActivity
@@ -187,7 +185,7 @@ public object Main {
                 @DrawableRes resId: Int,
                 component: KClass<out AppComponent>
             ) {
-                val view = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
+                val label = TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
                     this.text = text
                     typeface = font
                 }
@@ -196,11 +194,11 @@ public object Main {
                     icon.mutate().setTint(
                         ColorCompat.getThemedColor(context, R.b.colorInteractiveNormal)
                     )
-                    view.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
+                    label.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
                 }
 
-                view.setOnClickListener { e -> openPage(e.context, component.java) }
-                addView(view)
+                label.setOnClickListener { e -> openPage(e.context, component.java) }
+                addView(label)
             }
 
             makeSettingsEntry("Settings", R.e.ic_behavior_24dp, AliucordSettingsPage::class)
@@ -249,9 +247,8 @@ public object Main {
         // Patch for custom footer actions
         GlobalPatcher.before<WidgetChangeLog>("configureFooter") { param ->
             val binding = WidgetChangeLog.`access$getBinding$p`(this)
-            val actions =
-                mostRecentIntent.getParcelableArrayExtra("INTENT_EXTRA_FOOTER_ACTIONS")
-                    ?: return@before
+            val actions = mostRecentIntent.getParcelableArrayExtra("INTENT_EXTRA_FOOTER_ACTIONS")
+                ?: return@before
             val twitterButton = binding.g
             val parent = twitterButton.parent as LinearLayout
             parent.removeAllViewsInLayout()
@@ -280,8 +277,6 @@ public object Main {
 
             param.result = null
         }
-
-
     }
 
     private fun crashHandler(thread: Thread, throwable: Throwable) {
@@ -303,7 +298,7 @@ public object Main {
                         val loadedClass = key.loadClass(className)
 
                         // class was loaded from the parent classloader, ignore
-                        if (loadedClass.getClassLoader() != key) continue
+                        if (loadedClass.classLoader != key) continue
 
                         badPlugin = plugin.name
 
@@ -319,6 +314,7 @@ public object Main {
                 if (badPlugin != null) break
             }
             val folder = File(Constants.CRASHLOGS_PATH)
+
             if (folder.exists() || folder.mkdir()) {
                 val file = folder.resolve(
                     Timestamp(System.currentTimeMillis()).toString()
@@ -357,7 +353,9 @@ public object Main {
         if (!dir.exists()) {
             val res = dir.mkdirs()
 
-            if (!res) return logger.error("Failed to create directories!", null)
+            if (!res) {
+                return logger.error("Failed to create directories!", null)
+            }
         }
 
         dir
@@ -392,9 +390,7 @@ public object Main {
     }
 
     private fun checkPermissions(activity: AppCompatActivity): Boolean {
-        val perm = Manifest.permission.WRITE_EXTERNAL_STORAGE
-
-        if (activity.checkSelfPermission(perm) == PackageManager.PERMISSION_GRANTED) return true
+        if (activity.checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) return true
 
         activity.registerForActivityResult(RequestPermission()) { granted ->
             if (granted) {
@@ -408,7 +404,7 @@ public object Main {
                     Toast.LENGTH_LONG
                 ).show()
             }
-        }.launch(perm)
+        }.launch(WRITE_EXTERNAL_STORAGE)
 
         return false
     }

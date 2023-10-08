@@ -56,7 +56,6 @@ internal class CrashesPage : SettingsPage() {
                 true
             }
 
-
         val crashes = getCrashes()
         if (crashes.isNullOrEmpty()) {
             TextView(context, null, 0, R.i.UiKit_Settings_Item_Header).run {

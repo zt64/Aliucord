@@ -16,42 +16,42 @@ import com.discord.api.role.GuildRoleTags
 @Suppress("unused")
 public class GuildRoleWrapper(private val role: GuildRole) {
     /** Returns the raw (obfuscated) [GuildRole] Object associated with this wrapper */
-    fun raw() = role
+    public fun raw(): GuildRole = role
 
-    public val color
+    public val color: Int
         get() = role.color
 
-    public val hoist
+    public val hoist: Boolean
         get() = role.hoist
 
-    public val icon
+    public val icon: String?
         get() = role.icon
 
-    public val id
+    public val id: Long
         get() = role.id
 
-    public val managed
+    public val managed: Boolean
         get() = role.managed
 
-    public val mentionable
+    public val mentionable: Boolean
         get() = role.mentionable
 
-    public val name
+    public val name: String
         get() = role.name
 
-    public val permissions
+    public val permissions: Long
         get() = role.permissions
 
-    public val position
+    public val position: Int
         get() = role.position
 
-    public val tags
+    public val tags: GuildRoleTags?
         get() = role.tags
 
-    public val unicodeEmoji
+    public val unicodeEmoji: String?
         get() = role.unicodeEmoji
 
-    companion object {
+    public companion object {
         @JvmStatic
         public val GuildRole.color: Int
             get() = b()

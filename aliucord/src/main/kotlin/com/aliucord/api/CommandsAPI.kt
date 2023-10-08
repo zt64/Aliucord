@@ -25,9 +25,7 @@ import com.discord.models.commands.*
 import com.discord.models.domain.NonceGenerator
 import com.discord.models.message.Message
 import com.discord.models.user.User
-import com.discord.stores.StoreApplicationInteractions
-import com.discord.stores.StoreMessages
-import com.discord.stores.StoreStream
+import com.discord.stores.*
 import com.discord.utilities.SnowflakeUtils
 import com.discord.utilities.attachments.AttachmentUtilsKt
 import com.discord.utilities.message.LocalMessageCreatorsKt
@@ -35,10 +33,10 @@ import com.discord.utilities.time.ClockFactory
 import com.discord.utilities.user.UserUtils
 import com.discord.widgets.chat.MessageContent
 import com.discord.widgets.chat.input.*
-import com.discord.widgets.chat.list.sheet.WidgetApplicationCommandBottomSheetViewModel
+import com.discord.widgets.chat.list.sheet.WidgetApplicationCommandBottomSheetViewModel.StoreState
 import com.lytefast.flexinput.R
 
-@Suppress("unused")
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 public class CommandsAPI internal constructor(
     /** Name of the plugin associated with this CommandsAPI  */
     private val pluginName: String
@@ -62,7 +60,7 @@ public class CommandsAPI internal constructor(
     ) {
         registerCommand(pluginName, name, description, options, execute)
         commandsAndPlugins[name] = pluginName
-        pluginCommands.add(name)
+        pluginCommands += name
     }
 
     /**
@@ -228,7 +226,7 @@ public class CommandsAPI internal constructor(
         public var commandsAndPlugins: MutableMap<String, String> = hashMapOf()
 
         /** InteractionsStore  */
-        public var interactionsStore: MutableMap<Long, WidgetApplicationCommandBottomSheetViewModel.StoreState> =
+        public var interactionsStore: MutableMap<Long, StoreState> =
             hashMapOf()
 
         /** Optional CommandOption of type String  */
@@ -311,10 +309,10 @@ public class CommandsAPI internal constructor(
 
                 Utils.threadPool.execute {
                     try {
-                        val res = execute.invoke(ctx)
+                        val res = execute(ctx)
                             ?: return@execute storeMessages.deleteMessage(thinkingMsg)
-                        val hasContent = res.content != null && res.content!!.isNotEmpty()
-                        val hasEmbeds = res.embeds != null && res.embeds!!.isNotEmpty()
+                        val hasContent = !res.content.isNullOrEmpty()
+                        val hasEmbeds = !res.embeds.isNullOrEmpty()
                         if (!res.send) {
                             if (!hasContent && !hasEmbeds && ctx.attachments.isEmpty()) {
                                 storeMessages.deleteMessage(thinkingMsg)
@@ -322,7 +320,7 @@ public class CommandsAPI internal constructor(
                             }
                             try {
                                 val commandMessage = LocalMessageCreatorsKt.createLocalMessage(
-                                    if (res.content == null) "" else res.content,
+                                    res.content.orEmpty(),
                                     channelId,
                                     buildClyde(res.username, res.avatarUrl),
                                     null,
@@ -343,8 +341,10 @@ public class CommandsAPI internal constructor(
                                 setField(c, commandMessage, "embeds", res.embeds)
                                 setField(c, commandMessage, "flags", MessageFlags.EPHEMERAL)
                                 setField(c, commandMessage, "interaction", thinkingMsg.interaction)
-                                if (res.buttons != null) for (button in res.buttons!!) {
-                                    commandMessage.addButton(button)
+                                if (res.buttons != null) {
+                                    res.buttons!!.forEach { button ->
+                                        commandMessage.addButton(button)
+                                    }
                                 }
 
                                 // TODO: add arguments
@@ -353,7 +353,7 @@ public class CommandsAPI internal constructor(
                                     StoreStream.getChannels().getChannel(channelId)
                                 ).guildId
                                 interactionsStore[id] =
-                                    WidgetApplicationCommandBottomSheetViewModel.StoreState(
+                                    StoreState(
                                         me,
                                         if (guildId == 0L) null else StoreStream.getGuilds().members[guildId]!![me.id],
                                         StoreApplicationInteractions.State.Loaded(
