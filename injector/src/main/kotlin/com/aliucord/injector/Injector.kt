@@ -24,8 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.reflect.KClass
 
-private const val BASE_URL = "https://raw.githubusercontent.com/Aliucord/Aliucord/builds"
-private const val DEX_URL = "$BASE_URL/Aliucord.zip"
+private const val BASE_URL = "https://raw.githubusercontent.com/zt64/zeetcord/builds"
+private const val DEX_URL = "$BASE_URL/aliucord.zip"
 private const val DISCORD_VERSION = 126021
 private const val ALIUCORD_FROM_STORAGE_KEY = "AC_from_storage"
 private val BASE_DIRECTORY = Environment.getExternalStorageDirectory().resolve("Aliucord")
@@ -68,7 +68,7 @@ private fun init(appActivity: AppActivity) {
     Logger.d("Initializing Aliucord...")
 
     try {
-        val dexFile = File(appActivity.codeCacheDir, "Aliucord.zip")
+        val dexFile = File(appActivity.codeCacheDir, "aliucord.zip")
 
         if (!useLocalDex(appActivity, dexFile) && !dexFile.exists()) {
             val successRef = AtomicBoolean(true)
@@ -106,7 +106,7 @@ private fun init(appActivity: AppActivity) {
         Logger.d("Finished initializing Aliucord")
     } catch (th: Throwable) {
         error(appActivity, "Failed to initialize Zeetcord", th)
-        appActivity.codeCacheDir.resolve("Aliucord.zip").delete()
+        appActivity.codeCacheDir.resolve("aliucord.zip").delete()
     }
 }
 

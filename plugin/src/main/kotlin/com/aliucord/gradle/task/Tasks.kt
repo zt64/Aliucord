@@ -138,11 +138,11 @@ fun registerTasks(project: Project) {
             from(compileDexTask.outputFile)
 
             if (extension.projectType.get() == ProjectType.INJECTOR) {
-                into(project.buildDir)
-                rename { return@rename "Injector.dex" }
+                into(project.layout.buildDirectory)
+                rename { return@rename "injector.dex" }
 
                 doLast {
-                    logger.lifecycle("Copied Injector.dex to ${project.buildDir}")
+                    logger.lifecycle("Copied Injector.dex to ${project.layout.buildDirectory}")
                 }
             } else {
                 this as Zip
@@ -151,7 +151,7 @@ fun registerTasks(project: Project) {
                 isPreserveFileTimestamps = false
                 archiveBaseName.set(project.name)
                 archiveVersion.set("")
-                destinationDirectory.set(project.buildDir)
+                destinationDirectory.set(project.layout.buildDirectory)
 
                 doLast {
                     logger.lifecycle("Made Aliucord package at ${outputs.files.singleFile}")
