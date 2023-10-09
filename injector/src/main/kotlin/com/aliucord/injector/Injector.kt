@@ -28,6 +28,7 @@ private const val BASE_URL = "https://raw.githubusercontent.com/zt64/zeetcord/bu
 private const val DEX_URL = "$BASE_URL/aliucord.zip"
 private const val DISCORD_VERSION = 126021
 private const val ALIUCORD_FROM_STORAGE_KEY = "AC_from_storage"
+
 private val BASE_DIRECTORY = Environment.getExternalStorageDirectory().resolve("Aliucord")
 
 fun init() {
@@ -44,15 +45,11 @@ fun init() {
                     init(param.thisObject as AppActivity)
                     unhook.unhook()
                 }
-            })
+            }
+        )
     } catch (th: Throwable) {
         Logger.e("Failed to initialize Aliucord", th)
     }
-}
-
-private fun error(ctx: Context, msg: String, th: Throwable? = null) {
-    Logger.e(msg, th)
-    Handler(Looper.getMainLooper()).post { Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show() }
 }
 
 private fun init(appActivity: AppActivity) {
@@ -126,7 +123,7 @@ private fun useLocalDex(appActivity: AppActivity, dexFile: File): Boolean {
     }
 
     if (useLocalDex) {
-        BASE_DIRECTORY.resolve("Aliucord.zip").run {
+        BASE_DIRECTORY.resolve("aliucord.zip").run {
             if (exists()) {
                 Logger.d("Loading dex from $absolutePath")
                 copyTo(dexFile, true)
@@ -142,12 +139,12 @@ private fun useLocalDex(appActivity: AppActivity, dexFile: File): Boolean {
  * Public so it can be manually triggered from Aliucord to update itself
  * outputFile should be new File(context.getCodeCacheDir(), "Aliucord.zip");
  */
-private fun downloadLatestAliucordDex(outputFile: File) {
-    Logger.d("Downloading Aliucord.zip from $DEX_URL...")
+fun downloadLatestAliucordDex(outputFile: File) {
+    Logger.d("Downloading aliucord.zip from $DEX_URL...")
     URL(DEX_URL).openStream().use {
         it.copyTo(outputFile.outputStream())
     }
-    Logger.d("Finished downloading Aliucord.zip")
+    Logger.d("Finished downloading aliucord.zip")
 }
 
 @Suppress("DiscouragedPrivateApi") // this private api seems to be stable, thanks to facebook who use it in the facebook app
@@ -155,11 +152,10 @@ private fun addDexToClasspath(dex: File, classLoader: ClassLoader) {
     Logger.d("Adding Aliucord to the classpath...")
 
     // https://android.googlesource.com/platform/libcore/+/58b4e5dbb06579bec9a8fc892012093b6f4fbe20/dalvik/src/main/java/dalvik/system/BaseDexClassLoader.java#59
-    val pathListField = BaseDexClassLoader::class["pathList"]
-    val pathList = pathListField[classLoader]!!
-    val addDexPath =
-        pathList.javaClass.getDeclaredMethod("addDexPath", String::class.java, File::class.java)
-            .apply { isAccessible = true }
+    val pathList = BaseDexClassLoader::class["pathList"][classLoader]!!
+    val addDexPath = pathList.javaClass
+        .getDeclaredMethod("addDexPath", String::class.java, File::class.java)
+        .apply { isAccessible = true }
     addDexPath(pathList, dex.absolutePath, null)
 
     Logger.d("Successfully added Aliucord to the classpath")
@@ -187,6 +183,11 @@ private fun pruneArtProfile(ctx: Context): Boolean {
     }
 
     return true
+}
+
+private fun error(ctx: Context, msg: String, th: Throwable? = null) {
+    Logger.e(msg, th)
+    Handler(Looper.getMainLooper()).post { Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show() }
 }
 
 @Suppress("NOTHING_TO_INLINE")
