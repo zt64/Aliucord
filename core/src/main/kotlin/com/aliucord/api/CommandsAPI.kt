@@ -114,7 +114,7 @@ class CommandsAPI internal constructor(
      * Unregisters all commands
      */
     fun unregisterAll() {
-        for (name in pluginCommands) {
+        pluginCommands.forEach { name ->
             unregisterCommand(name)
             commandsAndPlugins.remove(name)
         }

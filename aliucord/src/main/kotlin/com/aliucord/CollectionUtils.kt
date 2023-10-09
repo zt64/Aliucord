@@ -129,7 +129,7 @@ public object CollectionUtils {
         vararg items: E
     ): List<E> {
         val ret = ArrayList<E>(deleteCount)
-        for (i in 0 until deleteCount) ret += list.removeAt(start + i)
+        repeat(deleteCount) { i -> ret += list.removeAt(start + i) }
         list.addAll(start, items.toList())
         return ret
     }

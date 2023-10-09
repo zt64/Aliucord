@@ -24,10 +24,11 @@ import com.lytefast.flexinput.R
 @Suppress("SetTextI18n")
 internal class PluginCard(ctx: Context) : MaterialCardView(ctx) {
     private val root: LinearLayout
+    private val buttonLayout: GridLayout
+
     val switchHeader: CheckedSetting
     val titleView: TextView
     val descriptionView: TextView
-    private val buttonLayout: GridLayout
     val settingsButton: Button
     val uninstallButton: DangerButton
     val repoButton: ToolbarButton

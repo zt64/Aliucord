@@ -29,7 +29,7 @@ public object Updater {
 
             if (versions.size > newVersions.size) return false
 
-            for (i in versions.indices) {
+            versions.indices.forEach { i ->
                 val newInt = newVersions[i].toInt()
                 val oldInt = versions[i].toInt()
                 if (newInt > oldInt) return true

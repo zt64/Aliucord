@@ -9,7 +9,7 @@ import android.os.Environment
 import com.aliucord.utils.ReflectUtils
 import com.discord.stores.StoreStream
 
-@Suppress("unused")
+@Suppress("unused", "ConstPropertyName")
 public object Constants {
     /** Link to the Aliucord github repo  */
     public const val ALIUCORD_GITHUB_REPO: String = "https://github.com/Aliucord/Aliucord"

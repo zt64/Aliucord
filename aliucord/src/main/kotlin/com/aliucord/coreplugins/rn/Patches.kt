@@ -136,7 +136,7 @@ internal fun patchUser() {
             GuildMember::class.java
         ), PreHook {
             val user = it.args[0] as ModelUser
-            if (globalNames.containsKey(user.id)) it.result = UserUtils.INSTANCE.getUserNameWithDiscriminator(user, null, null)
+            if (user.id in globalNames) it.result = UserUtils.INSTANCE.getUserNameWithDiscriminator(user, null, null)
         })
     val headerViewModel = UserProfileHeaderViewModel.ViewState.Loaded::class.java
     GlobalPatcher.addPatch(UserProfileHeaderView::class.java.getDeclaredMethod("configureSecondaryName", headerViewModel), object : XC_MethodHook() {

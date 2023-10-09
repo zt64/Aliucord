@@ -133,7 +133,7 @@ public abstract class Plugin @JvmOverloads constructor(manifest: Manifest? = nul
         /** The arguments that will be passed to the constructor of the component  */
         @JvmField
         public var args: Array<out Any> = emptyArray()
-        // TODO: public boolean addTab = false;
+
         /**
          * Creates a SettingsTab with a dedicated page
          * @param settings The settings page fragment

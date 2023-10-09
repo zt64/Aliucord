@@ -121,8 +121,11 @@ internal class UpdaterPage : SettingsPage() {
             Utils.threadPool.execute {
                 PluginUpdater.cache.clear()
                 PluginUpdater.checkUpdates(false)
-                val updateCount = PluginUpdater.updates.size
-                stateText = if (updateCount == 0) "No updates found" else "Found ${pluralize(updateCount, "update")}"
+                stateText = if (PluginUpdater.updates.isEmpty()) {
+                    "No updates found"
+                } else {
+                    "Found ${pluralize(PluginUpdater.updates.size, "update")}"
+                }
                 Utils.mainThread.post(::reRender)
             }
             true
@@ -143,8 +146,7 @@ internal class UpdaterPage : SettingsPage() {
             true
         }
 
-        val updateCount = PluginUpdater.updates
-        if (updateCount.isEmpty()) {
+        if (PluginUpdater.updates.isEmpty()) {
             val state = TextView(context, null, 0, R.i.UiKit_Settings_Item_SubText).apply {
                 text = stateText
                 setPadding(defaultPadding, defaultPadding, defaultPadding, defaultPadding)
@@ -153,7 +155,7 @@ internal class UpdaterPage : SettingsPage() {
             return addView(state)
         }
 
-        stateText = "Found ${pluralise(updateCount.size, "update")}"
+        stateText = "Found ${pluralise(PluginUpdater.updates.size, "update")}"
         setActionBarSubtitle(stateText)
 
         PluginUpdater.updates.forEach { plugin ->

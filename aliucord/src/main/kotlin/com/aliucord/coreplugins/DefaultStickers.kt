@@ -47,39 +47,37 @@ internal class DefaultStickers : Plugin(Manifest("DefaultStickers")) {
                 override fun beforeHookedMethod(param: MethodHookParam) {
                     val data = param.args[0] as StickerPickerViewModel.StoreState.Loaded
                     val me = data.meUser
-                    if (!UserUtils.INSTANCE.getCanUsePremiumStickers(me)) {
-                        val items = param.args[1] as MutableList<*>
-                        val companion = StickerPickerViewModel.Companion
-                        val locale = localeField[param.thisObject] as Locale
-                        val query = data.searchInputStringUpper.lowercase(locale)
-                        val animationSettings = data.stickerAnimationSettings
 
-                        for (pack in data.enabledStickerPacks) {
-                            items.addAll(
-                                StickerPickerViewModel.Companion.`access$buildStickerListItems`(
-                                    companion,
-                                    pack,
-                                    query,
-                                    animationSettings,
-                                    locale,
-                                    me
-                                ) as List<Nothing>
-                            )
-                        }
+                    if (UserUtils.INSTANCE.getCanUsePremiumStickers(me)) return
+
+                    val items = param.args[1] as MutableList<*>
+                    val companion = StickerPickerViewModel.Companion
+                    val locale = localeField[param.thisObject] as Locale
+                    val query = data.searchInputStringUpper.lowercase(locale)
+                    val animationSettings = data.stickerAnimationSettings
+
+                    data.enabledStickerPacks.forEach { pack ->
+                        items += StickerPickerViewModel.Companion.`access$buildStickerListItems`(
+                            companion,
+                            pack,
+                            query,
+                            animationSettings,
+                            locale,
+                            me
+                        ) as List<Nothing>
                     }
                 }
 
                 override fun afterHookedMethod(param: MethodHookParam) {
                     val data = param.args[0] as StickerPickerViewModel.StoreState.Loaded
-                    if (!UserUtils.INSTANCE.getCanUsePremiumStickers(data.meUser)) {
-                        val res = param.result as MutableList<StickerCategoryItem>
-                        val selected = data.selectedCategoryId
-                        var i = res.lastOrNull()?.categoryRange?.second ?: 0
-                        for (pack in data.enabledStickerPacks) {
-                            val j = pack.stickers.size + 1 + i
-                            res += StickerCategoryItem.PackItem(pack, i to j, selected == pack.id)
-                            i = j
-                        }
+                    if (UserUtils.INSTANCE.getCanUsePremiumStickers(data.meUser)) return
+                    val res = param.result as MutableList<StickerCategoryItem>
+                    val selected = data.selectedCategoryId
+                    var i = res.lastOrNull()?.categoryRange?.second ?: 0
+                    data.enabledStickerPacks.forEach { pack ->
+                        val j = pack.stickers.size + 1 + i
+                        res += StickerCategoryItem.PackItem(pack, i to j, selected == pack.id)
+                        i = j
                     }
                 }
             })
@@ -98,15 +96,15 @@ internal class DefaultStickers : Plugin(Manifest("DefaultStickers")) {
             "call",
             SendUtils.SendPayload.ReadyToSend::class.java
         ) { (it, payload: SendUtils.SendPayload.ReadyToSend) ->
-            if (!UserUtils.INSTANCE.getCanUsePremiumStickers(StoreStream.getUsers().me)) {
-                val message = payload.message
-                if (message.stickerIds.isNotEmpty()) {
-                    it.result = BehaviorSubject.l0(
-                        Http.Request.newDiscordRNRequest("/channels/${`$message`.channelId}/messages", "POST")
-                            .executeWithJson(GsonUtils.gsonRestApi, message).json(GsonUtils.gsonRestApi, Message::class.java)
-                    )
-                }
-            }
+            if (UserUtils.INSTANCE.getCanUsePremiumStickers(StoreStream.getUsers().me)) return@before
+
+            val message = payload.message
+            if (message.stickerIds.isEmpty()) return@before
+            it.result = BehaviorSubject.l0(
+                Http.Request.newDiscordRNRequest("/channels/${`$message`.channelId}/messages", "POST")
+                    .executeWithJson(GsonUtils.gsonRestApi, message)
+                    .json(GsonUtils.gsonRestApi, Message::class.java)
+            )
         }
     }
 }

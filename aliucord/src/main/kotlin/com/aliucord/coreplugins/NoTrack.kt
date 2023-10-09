@@ -42,7 +42,7 @@ internal class NoTrack : Plugin(Manifest("NoTrack")) {
 
         val cl = NoTrack::class.java.getClassLoader()!!
 
-        for ((className, value) in map) {
+        map.forEach { (className, value) ->
             val clazz = cl.loadClass(className)
             value.forEach { fn ->
                 XposedBridge.hookAllMethods(clazz, fn, InsteadHook.DO_NOTHING)

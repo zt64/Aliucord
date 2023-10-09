@@ -14,8 +14,8 @@ import java.io.File
 
 internal class CoreCommands : Plugin(Manifest("CoreCommands")) {
     override fun start(context: Context) {
-        fun formatPlugins(plugins: List<Plugin>, showVersions: Boolean): String {
-            return plugins.joinToString { p ->
+        fun List<Plugin>.formatPlugins(showVersions: Boolean): String {
+            return joinToString { p ->
                 "${p.name}${if (showVersions) " (${p.manifest.version})" else ""}"
             }
         }
@@ -40,11 +40,11 @@ internal class CoreCommands : Plugin(Manifest("CoreCommands")) {
 
             val plugins = PluginManager.plugins
             val (enabled, disabled) = plugins.values.partition(PluginManager::isPluginEnabled)
-            val enabledStr = formatPlugins(enabled, showVersions)
-            val disabledStr = formatPlugins(disabled, showVersions)
+            val enabledStr = enabled.formatPlugins(showVersions)
+            val disabledStr = disabled.formatPlugins(showVersions)
 
             if (plugins.isEmpty()) {
-                CommandResult("No plugins installed", null, false)
+                CommandResult("No plugins installed", send = false)
             } else {
                 CommandResult(
                     """
@@ -53,8 +53,7 @@ internal class CoreCommands : Plugin(Manifest("CoreCommands")) {
             **Disabled Plugins (${disabled.size}):**
             ${if (disabled.isEmpty()) "None" else "> $disabledStr"}
                             """,
-                    null,
-                    it.getBoolOrDefault("send", false)
+                    send = it.getBoolOrDefault("send", false)
                 )
             }
         }
@@ -64,8 +63,7 @@ internal class CoreCommands : Plugin(Manifest("CoreCommands")) {
             val str = """
 **Debug Info:**
 > Discord: ${Constants.DISCORD_VERSION}
-> Aliucord: ${BuildConfig.VERSION} ${if (BuildConfig.RELEASE) "" else "(Custom)"}
-> Plugins: ${PluginManager.plugins.size} installed, ${PluginManager.plugins.values.count(PluginManager::isPluginEnabled)} enabled
+> Zeetcord: ${BuildConfig.GIT_REVISION} (${PluginManager.plugins.size} plugins)
 > System: Android ${Build.VERSION.RELEASE} (SDK v${Build.VERSION.SDK_INT}) - ${getArchitecture()}
 > Rooted: ${getIsRooted() ?: "Unknown"}
             """

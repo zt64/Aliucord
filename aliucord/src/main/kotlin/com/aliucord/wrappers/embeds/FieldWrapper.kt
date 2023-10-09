@@ -16,15 +16,15 @@ public class FieldWrapper(private val field: EmbedField) {
     /** Returns the raw (obfuscated) [EmbedField] Object associated with this wrapper  */
     public fun raw(): EmbedField = field
 
-    public val name
-        get() = field.name
+    public val name: String
+        get() = this.field.value
 
-    public val value
-        get() = field.value
+    public val value: String
+        get() = this.field.value
 
     @get:JvmName("isInline")
-    public val inline
-        get() = field.inline
+    public val inline: Boolean
+        get() = this.field.inline
 
     public companion object {
         @JvmStatic
@@ -35,8 +35,8 @@ public class FieldWrapper(private val field: EmbedField) {
         public val EmbedField.value: String
             get() = b()
 
-        private val inlineField =
-            EmbedField::class.java.getDeclaredField("inline").apply { isAccessible = true }
+        private val inlineField = EmbedField::class.java.getDeclaredField("inline")
+            .apply { isAccessible = true }
 
         @JvmStatic
         @get:JvmName("isInline")

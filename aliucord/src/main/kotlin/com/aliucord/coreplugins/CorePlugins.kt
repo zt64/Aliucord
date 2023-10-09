@@ -30,7 +30,7 @@ internal object CorePlugins {
 
         loaded = true
 
-        for (p in corePlugins) {
+        corePlugins.forEach { p ->
             PluginManager.logger.info("Loading core plugin: ${p.name}")
 
             try {
@@ -47,7 +47,7 @@ internal object CorePlugins {
 
         started = true
 
-        for (p in corePlugins) {
+        corePlugins.forEach { p ->
             PluginManager.logger.info("Starting core plugin: ${p.name}")
 
             try {

@@ -79,7 +79,7 @@ public object PluginManager {
                 }
                 )
             val pluginInstance = pluginClass.getDeclaredConstructor().newInstance()
-            if (plugins.containsKey(name)) {
+            if (name in plugins) {
                 logger.error("Plugin with name $name already exists", null)
                 return
             }
@@ -215,7 +215,7 @@ public object PluginManager {
      */
     @JvmStatic
     public fun remountPlugin(name: String) {
-        require(plugins.containsKey(name)) { "No such plugin: $name" }
+        require(name in plugins) { "No such plugin: $name" }
         require(isPluginEnabled(name)) { "Plugin not enabled: $name" }
         stopPlugin(name)
         unloadPlugin(name)

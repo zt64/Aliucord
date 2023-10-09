@@ -9,6 +9,7 @@ package com.aliucord.coreplugins
 import android.content.ContentResolver
 import android.content.Context
 import android.view.View
+import com.aliucord.Http
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.*
 import com.aliucord.utils.GsonUtils
@@ -21,7 +22,7 @@ import com.discord.restapi.utils.CountingRequestBody
 import com.discord.utilities.messagesend.`MessageQueue$doSend$2`
 import com.discord.utilities.premium.PremiumUtils
 import com.discord.utilities.rest.AttachmentRequestBody
-import com.discord.utilities.rest.SendUtils
+import com.discord.utilities.rest.SendUtils.SendPayload.ReadyToSend
 import com.lytefast.flexinput.model.Attachment
 import de.robv.android.xposed.XposedBridge
 import rx.subjects.BehaviorSubject
@@ -93,20 +94,21 @@ internal class UploadSize : Plugin(Manifest("UploadSize")) {
         val contentResolverField = attachmentRequestBody.getDeclaredField("contentResolver").apply { isAccessible = true }
         val attachmentField = attachmentRequestBody.getDeclaredField("attachment").apply { isAccessible = true }
 
-        patcher.before<`MessageQueue$doSend$2`<*, *>>("call", SendUtils.SendPayload.ReadyToSend::class.java) {
-            val payload = it.args[0] as SendUtils.SendPayload.ReadyToSend
+        patcher.before<`MessageQueue$doSend$2`<*, *>>("call", ReadyToSend::class.java) { (it, payload: ReadyToSend) ->
             if (payload.uploads.isEmpty()) return@before
 
             val channelId = `$message`.channelId
             val attachments = ArrayList<MessagePayload.Attachment>(payload.uploads.size)
-            for (upload in payload.uploads) {
+
+            payload.uploads.forEach { upload ->
                 val countingReqBody = upload.part.b
                 val reqBody = delegate[countingReqBody]
                 val contentResolver = contentResolverField[reqBody] as ContentResolver
                 val attachment = attachmentField[reqBody] as Attachment<*>
 
                 contentResolver.openInputStream(attachment.uri)?.use { inputStream ->
-                    val initReq = com.aliucord.Http.Request.newDiscordRNRequest("/channels/$channelId/attachments", "POST")
+                    val initReq = Http.Request
+                        .newDiscordRNRequest("/channels/$channelId/attachments", "POST")
                         .executeWithJson(
                             InitAttachmentUpload(
                                 arrayOf(
@@ -114,13 +116,15 @@ internal class UploadSize : Plugin(Manifest("UploadSize")) {
                                 )
                             )
                         )
+
                     if (!initReq.ok()) {
                         logger.error("Failed to upload ${initReq.statusCode}: ${initReq.text()}", null)
                         return@before // fallbacks to legacy upload
                     }
+
                     val initRes = initReq.json(InitAttachmentUploadRes::class.java).attachments[0]
 
-                    val uploadReq = com.aliucord.Http.Request(initRes.upload_url, "PUT")
+                    val uploadReq = Http.Request(initRes.upload_url, "PUT")
                         .setHeader("User-Agent", RNSuperProperties.USER_AGENT)
                         .setHeader("Content-Type", upload.mimeType)
                         .setHeader("Content-Length", upload.contentLength.toString())
@@ -128,15 +132,17 @@ internal class UploadSize : Plugin(Manifest("UploadSize")) {
                     uploadReq.conn.setFixedLengthStreamingMode(upload.contentLength)
 
                     uploadReq.conn.outputStream.use { outputStream ->
-                        var totalBytes: Long = 0
+                        var totalBytes = 0L
                         var currentBytes: Int
                         val buffer = ByteArray(8192)
                         val subject = bytesWrittenSubject[countingReqBody] as BehaviorSubject<Long>
+
                         while (inputStream.read(buffer).also { b -> currentBytes = b } > 0) {
                             outputStream.write(buffer, 0, currentBytes)
                             totalBytes += currentBytes
                             subject.onNext(totalBytes)
                         }
+
                         outputStream.flush()
                     }
                     uploadReq.execute().run {
@@ -152,18 +158,21 @@ internal class UploadSize : Plugin(Manifest("UploadSize")) {
 
             payload.message.run {
                 it.result = BehaviorSubject.l0(
-                    com.aliucord.Http.Request.newDiscordRNRequest("/channels/$channelId/messages", "POST").executeWithJson(
-                        GsonUtils.gsonRestApi,
-                        MessagePayload(
-                            content.trimEnd(),
-                            channelId.toString(),
-                            if (messageReference == null) 0 else 19,
-                            messageReference,
-                            allowedMentions,
-                            attachments,
-                            nonce
+                    Http.Request
+                        .newDiscordRNRequest("/channels/$channelId/messages", "POST")
+                        .executeWithJson(
+                            GsonUtils.gsonRestApi,
+                            MessagePayload(
+                                content.trimEnd(),
+                                channelId.toString(),
+                                if (messageReference == null) 0 else 19,
+                                messageReference,
+                                allowedMentions,
+                                attachments,
+                                nonce
+                            )
                         )
-                    ).json(GsonUtils.gsonRestApi, Message::class.java)
+                        .json(GsonUtils.gsonRestApi, Message::class.java)
                 )
             }
         }

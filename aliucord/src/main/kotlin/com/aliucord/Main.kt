@@ -253,7 +253,7 @@ public object Main {
             val parent = twitterButton.parent as LinearLayout
             parent.removeAllViewsInLayout()
 
-            for (parcelable in actions) {
+            actions.forEach { parcelable ->
                 val action = parcelable as FooterAction
                 val button = ToolbarButton(parent.context).apply {
                     setImageDrawable(

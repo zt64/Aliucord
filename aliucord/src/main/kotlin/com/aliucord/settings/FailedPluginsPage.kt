@@ -9,7 +9,7 @@
 package com.aliucord.settings
 
 import android.view.View
-import android.widget.LinearLayout
+import android.widget.LinearLayout.LayoutParams
 import com.aliucord.PluginManager
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.utils.DimenUtils.dp
@@ -27,7 +27,7 @@ internal class FailedPluginsPage : SettingsPage() {
         PluginManager.failedToLoad.forEach { (file, reason) ->
             linearLayout.addView(MaterialCardView(view.context).apply {
                 setCardBackgroundColor(ColorCompat.getThemedColor(view.context, R.b.colorBackgroundSecondary))
-                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
                     setMargins(0, 8.dp, 0, 8.dp)
                 }
                 addView(FailedPluginWidget(view.context, file, reason) {

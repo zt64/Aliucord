@@ -11,9 +11,9 @@ package com.aliucord.widgets
 import android.annotation.SuppressLint
 import android.content.Context
 import android.transition.TransitionManager
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -48,7 +48,7 @@ internal class FailedPluginWidget(
 
         orientation = VERTICAL
 
-        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT)
         setOnClickListener(this)
 
         mTextView = TextView(ctx, null, 0, R.i.UiKit_TextView).apply {
@@ -61,12 +61,12 @@ internal class FailedPluginWidget(
 
             orientation = HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT)
 
             setBackgroundColor(ColorCompat.getThemedColor(ctx, R.b.colorBackgroundSecondaryAlt))
             mFilenameView = TextView(ctx, null, 0, R.i.UiKit_TextView_Bold).apply {
                 gravity = Gravity.CENTER_VERTICAL
-                layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT).apply {
+                layoutParams = LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
                     weight = 1f
                 }
 
@@ -75,7 +75,7 @@ internal class FailedPluginWidget(
             }
 
             addView(ImageView(ctx).apply {
-                layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT).apply {
+                layoutParams = LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
                     gravity = Gravity.END
                 }
                 setImageDrawable(ContextCompat.getDrawable(ctx, R.e.ic_delete_24dp)!!.mutate().apply {
@@ -106,11 +106,10 @@ internal class FailedPluginWidget(
     }
 
     override fun onClick(view: View) {
-        if (canExpand) {
-            Utils.mainThread.post {
-                isExpanded = !isExpanded
-                configure()
-            }
+        if (!canExpand) return
+        Utils.mainThread.post {
+            isExpanded = !isExpanded
+            configure()
         }
     }
 }

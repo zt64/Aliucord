@@ -98,14 +98,11 @@ internal class UpdaterPluginCard(context: Context, plugin: String, forceUpdate: 
 
         val update = ToolbarButton(context).apply {
             setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.e.ic_file_download_white_24dp
-                )
+                ContextCompat.getDrawable(context, R.e.ic_file_download_white_24dp)
             )
             setPadding(paddingHalf, paddingHalf, 0, paddingHalf)
             setOnClickListener {
-                setEnabled(false)
+                isEnabled = false
                 Utils.threadPool.execute {
                     try {
                         PluginUpdater.update(plugin)

@@ -6,6 +6,7 @@ package com.aliucord.entities
 
 import android.graphics.drawable.Drawable
 import android.view.View
+import androidx.annotation.IdRes
 import com.discord.api.sticker.Sticker
 import com.discord.app.AppComponent
 import d0.e0.c
@@ -13,7 +14,7 @@ import d0.e0.c
 /**
  * Notification builder.
  */
-@Suppress("unused")
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 public class NotificationData {
     /**
      * @return Title of the notification.
@@ -193,7 +194,7 @@ public class NotificationData {
      * @param iconResId [IdRes] of the icon [Drawable].
      * @return [NotificationData] for chaining.
      */
-    public fun setIconResId(iconResId: Int?): NotificationData = apply {
+    public fun setIconResId(@IdRes iconResId: Int?): NotificationData = apply {
         this.iconResId = iconResId
     }
 

@@ -9,7 +9,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.lang.reflect.Type
-import java.math.BigDecimal
 
 /** Utility class to store and retrieve preferences  */
 @Suppress("unused")
@@ -30,12 +29,12 @@ public class SettingsUtilsJSON(plugin: String) {
     }
 
     private fun writeData() {
-        if (settings.length() > 0) {
-            try {
-                settingsFile.writeText(settings.toString(4))
-            } catch (e: Throwable) {
-                logger.error("Failed to save settings", e)
-            }
+        if (settings.length() == 0) return
+
+        try {
+            settingsFile.writeText(settings.toString(4))
+        } catch (e: Throwable) {
+            logger.error("Failed to save settings", e)
         }
     }
 
@@ -133,14 +132,10 @@ public class SettingsUtilsJSON(plugin: String) {
      * @param defValue Default value
      * @return Value if found, else the defValue
      */
-    public fun getFloat(key: String, defValue: Float): Float {
-        return if (settings.has(key)) {
-            BigDecimal
-                .valueOf(settings.getDouble(key))
-                .toFloat()
-        } else {
-            defValue
-        }
+    public fun getFloat(key: String, defValue: Float): Float = if (settings.has(key)) {
+        settings.getDouble(key).toFloat()
+    } else {
+        defValue
     }
 
     /**

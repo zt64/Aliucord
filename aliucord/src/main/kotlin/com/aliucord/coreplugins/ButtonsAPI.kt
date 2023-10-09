@@ -21,11 +21,12 @@ internal class ButtonsAPI : Plugin(Manifest("ButtonsAPI")) {
             String::class.java
         ) { (it, _: Any, customId: String) ->
             val acId = (-CommandsAPI.ALIUCORD_APP_ID).toString()
-            if (customId.startsWith(acId)) {
-                val id = customId.subSequence(CommandsAPI.ALIUCORD_APP_ID.toString().length, customId.length).toString()
-                actions[id]?.invoke(entry.message, adapter.fragmentManager.fragments[0]!!.requireActivity())
-                it.result = null
-            }
+
+            if (!customId.startsWith(acId)) return@before
+
+            val id = customId.subSequence(CommandsAPI.ALIUCORD_APP_ID.toString().length, customId.length).toString()
+            actions[id]?.invoke(entry.message, adapter.fragmentManager.fragments[0]!!.requireActivity())
+            it.result = null
         }
     }
 

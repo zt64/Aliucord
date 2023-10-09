@@ -8,15 +8,14 @@ package com.aliucord.views
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup.LayoutParams
-import com.aliucord.utils.DimenUtils.dpToPx
+import com.aliucord.utils.DimenUtils.dp
 import com.discord.utilities.color.ColorCompat
 import com.lytefast.flexinput.R
 
 /** Discord style Divider as seen in its settings  */
 public class Divider(context: Context) : View(context) {
     init {
-        val params = LayoutParams(LayoutParams.MATCH_PARENT, dpToPx(0.25f))
-        setLayoutParams(params)
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, 0.25f.dp)
         setBackgroundColor(ColorCompat.getThemedColor(context, R.b.colorPrimaryDivider))
     }
 }

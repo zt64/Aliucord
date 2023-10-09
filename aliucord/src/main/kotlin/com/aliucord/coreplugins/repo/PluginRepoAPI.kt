@@ -30,7 +30,7 @@ internal object PluginRepoAPI {
             }
             val pluginarray = JSONArray(Http.simplePost("$API_URL/getPlugins", filter.toString()))
             logger.info(pluginarray.toString())
-            for (i in 0 until pluginarray.length()) {
+            repeat(pluginarray.length()) { i ->
                 val plugin = pluginarray[i] as JSONObject
                 val pluginobj = getPluginFromJson(plugin)
 
@@ -38,7 +38,7 @@ internal object PluginRepoAPI {
                     localFilters.getOrDefault(
                         "showInstalledPlugins",
                         true
-                    ) as Boolean || !PluginManager.plugins.containsKey(pluginobj.name)
+                    ) as Boolean || pluginobj.name !in PluginManager.plugins
                 ) {
                     plugins += getPluginFromJson(plugin)
                 }

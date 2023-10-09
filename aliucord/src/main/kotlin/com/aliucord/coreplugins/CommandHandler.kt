@@ -46,30 +46,33 @@ internal class CommandHandler : Plugin(Manifest("CommandHandler")) {
 
         val storeApplicationCommands = StoreApplicationCommands::class.java
         GlobalPatcher.patch(storeApplicationCommands, "getApplications", emptyArray(), Hook {
-            val list = it.result.run { if (this == null) return@Hook else this as MutableList<Application?> }
+            val list = it.result as MutableList<Application?>? ?: return@Hook
             val acApp = CommandsAPI.getAliucordApplication()
-            if (!list.contains(acApp)) {
-                with(if (list is ArrayList<Application?>) list else ArrayList(list).apply { it.result = this }) {
-                    if (size == 0) add(acApp) else add(size - 1, acApp)
-                }
+
+            if (acApp in list) return@Hook
+
+            with(if (list is ArrayList<Application?>) list else ArrayList(list).apply { it.result = this }) {
+                if (size == 0) add(acApp) else add(lastIndex, acApp)
             }
         })
 
         GlobalPatcher.patch(storeApplicationCommands, "getApplicationMap", emptyArray(), Hook {
-            val map = it.result.run { if (this == null) return@Hook else this as MutableMap<Long?, Application?> }
-            if (!map.containsKey(CommandsAPI.ALIUCORD_APP_ID)) {
-                with(if (map is LinkedHashMap<Long?, Application?>) map else LinkedHashMap(map).apply { it.result = this }) {
-                    this[CommandsAPI.ALIUCORD_APP_ID] = CommandsAPI.getAliucordApplication()
-                }
+            val map = it.result as MutableMap<Long?, Application?>? ?: return@Hook
+
+            if (CommandsAPI.ALIUCORD_APP_ID in map) return@Hook
+
+            with(if (map is LinkedHashMap<Long?, Application?>) map else LinkedHashMap(map).apply { it.result = this }) {
+                this[CommandsAPI.ALIUCORD_APP_ID] = CommandsAPI.getAliucordApplication()
             }
         })
 
         GlobalPatcher.patch(storeApplicationCommands, "handleGuildApplicationsUpdate", arrayOf(List::class.java), PreHook {
-            val list = it.result.run { if (this == null) return@PreHook else this as MutableList<Application?> }
-            if (!list.contains(CommandsAPI.getAliucordApplication())) {
-                with(if (list is ArrayList<Application?>) list else ArrayList(list).apply { it.args[0] = this }) {
-                    add(CommandsAPI.getAliucordApplication())
-                }
+            val list = it.result as MutableList<Application?>? ?: return@PreHook
+
+            if (CommandsAPI.getAliucordApplication() in list) return@PreHook
+
+            with(if (list is ArrayList<Application?>) list else ArrayList(list).apply { it.args[0] = this }) {
+                add(CommandsAPI.getAliucordApplication())
             }
         })
 
@@ -87,18 +90,19 @@ internal class CommandHandler : Plugin(Manifest("CommandHandler")) {
         ) { (it, _: Any, data: ApplicationCommandData?) ->
             if (data == null) return@before
 
-            val command = data.applicationCommand.takeUnless { c ->
-                c == null || c !is RemoteApplicationCommand || !c.builtIn
+            val command = data.applicationCommand?.takeUnless { c ->
+                c !is RemoteApplicationCommand || !c.builtIn
             } ?: return@before
+
             val values = data.values ?: return@before
             val commandArgs = LinkedHashMap<String, Any?>(values.size).apply {
                 addValues(values)
                 this["__this"] = this@before
                 this["__args"] = it.args
             }
-            val execute = command.execute ?: return@before
 
-            execute(commandArgs)
+            command.execute?.invoke(commandArgs) ?: return@before
+
             it.result = true
         }
 
@@ -115,13 +119,16 @@ internal class CommandHandler : Plugin(Manifest("CommandHandler")) {
 
             val plugin = CommandsAPI.commandsAndPlugins[cmd.name] ?: return@after
             val binding = bindingField[this] as WidgetChatInputAutocompleteItemBinding
+
             binding.f.text = plugin.uppercase()
         }
 
         GlobalPatcher.before<Message>("isLocalApplicationCommand") {
             val type = type ?: return@before
-            if (isLoading && type != MessageTypes.LOCAL_APPLICATION_COMMAND && type != MessageTypes.LOCAL_APPLICATION_COMMAND_SEND_FAILED)
+
+            if (isLoading && type != MessageTypes.LOCAL_APPLICATION_COMMAND && type != MessageTypes.LOCAL_APPLICATION_COMMAND_SEND_FAILED) {
                 it.result = true
+            }
         }
 
         // don't mark Aliucord command messages as
@@ -138,13 +145,15 @@ internal class CommandHandler : Plugin(Manifest("CommandHandler")) {
 
         GlobalPatcher.before<WidgetApplicationCommandBottomSheetViewModel>("requestInteractionData") {
             if (applicationId != -1L) return@before
+
             val state = CommandsAPI.interactionsStore[interactionId]
             if (state != null) WidgetApplicationCommandBottomSheetViewModel.`access$handleStoreState`(this, state)
+
             it.result = null
         }
     }
 
-    private fun LinkedHashMap<String, Any?>.addValues(values: List<ApplicationCommandValue>) {
+    private fun HashMap<String, Any?>.addValues(values: Collection<ApplicationCommandValue>) {
         values.forEach { v ->
             val name = v.name
             val value = v.value

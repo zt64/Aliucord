@@ -14,9 +14,7 @@ import android.graphics.BitmapFactory
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.aliucord.Http
-import com.aliucord.Main
-import com.aliucord.Utils
+import com.aliucord.*
 import com.aliucord.entities.Plugin
 import com.aliucord.patcher.*
 import com.aliucord.utils.DimenUtils.dp
@@ -68,23 +66,25 @@ internal class Badges : Plugin(Manifest("Badges")) {
             ),
             Hook { (it, state: ViewState.Loaded) ->
                 val id = state.user.id
-                if (userBadges.containsKey(id)) {
-                    state.user.addUserBadges(it.thisObject)
-                } else if (!fetchingBadges.getAndSet(true)) {
-                    Utils.threadPool.execute {
-                        try {
-                            userBadges[id] = getUserBadges(
-                                Http.simpleJsonGet("$URL/users/$id.json", UserBadges::class.java)!!
-                            )
-                            state.user.addUserBadges(it.thisObject)
-                        } catch (e: Throwable) {
-                            if (e is Http.HttpException && e.statusCode == 404) {
-                                userBadges[id] = null
-                            } else {
-                                logger.error("Failed to get badges for user $id", e)
+                when {
+                    id in userBadges -> state.user.addUserBadges(it.thisObject)
+
+                    !fetchingBadges.getAndSet(true) -> {
+                        Utils.threadPool.execute {
+                            try {
+                                userBadges[id] = getUserBadges(
+                                    Http.simpleJsonGet("$URL/users/$id.json", UserBadges::class.java)!!
+                                )
+                                state.user.addUserBadges(it.thisObject)
+                            } catch (e: Throwable) {
+                                if (e is Http.HttpException && e.statusCode == 404) {
+                                    userBadges[id] = null
+                                } else {
+                                    logger.error("Failed to get badges for user $id", e)
+                                }
+                            } finally {
+                                fetchingBadges.set(false)
                             }
-                        } finally {
-                            fetchingBadges.set(false)
                         }
                     }
                 }
@@ -114,7 +114,7 @@ internal class Badges : Plugin(Manifest("Badges")) {
             Boolean::class.javaPrimitiveType!!
         ) { (_, guild: Guild?) ->
             val id = guild?.id ?: return@after
-            if (guildBadges.containsKey(id)) {
+            if (id in guildBadges) {
                 addGuildBadge(id, this)
             } else {
                 Utils.threadPool.execute {
@@ -136,40 +136,37 @@ internal class Badges : Plugin(Manifest("Badges")) {
 
     private fun getUserBadges(badges: UserBadges): List<Badge> {
         val list = ArrayList<Badge>(1)
+
         badges.roles?.forEach {
             when (it) {
-                "dev" -> list.add(
-                    Badge(
-                        R.e.ic_staff_badge_blurple_24dp,
-                        null,
-                        "Aliucord Developer",
-                        false,
-                        null
-                    )
+                "dev" -> list += Badge(
+                    R.e.ic_staff_badge_blurple_24dp,
+                    null,
+                    "Aliucord Developer",
+                    false,
+                    null
                 )
 
-                "donor" -> list.add(
-                    Badge(
-                        0,
-                        null,
-                        "Aliucord Donor",
-                        false,
-                        "https://cdn.discordapp.com/emojis/859801776232202280.webp"
-                    )
+                "donor" -> list += Badge(
+                    0,
+                    null,
+                    "Aliucord Donor",
+                    false,
+                    "https://cdn.discordapp.com/emojis/859801776232202280.webp"
                 )
 
-                "contributor" -> list.add(
-                    Badge(
-                        0,
-                        null,
-                        "Aliucord Contributor",
-                        false,
-                        "https://cdn.discordapp.com/emojis/886587553187246120.webp"
-                    )
+                "contributor" -> list += Badge(
+                    0,
+                    null,
+                    "Aliucord Contributor",
+                    false,
+                    "https://cdn.discordapp.com/emojis/886587553187246120.webp"
                 )
             }
         }
-        if (badges.custom?.isNotEmpty() == true) list.addAll(badges.custom.map { it.toDiscordBadge() })
+
+        if (!badges.custom.isNullOrEmpty()) list += badges.custom.map { it.toDiscordBadge() }
+
         return list
     }
 
@@ -184,20 +181,26 @@ internal class Badges : Plugin(Manifest("Badges")) {
     private var lastSetGuild: Long = 0
     private fun addGuildBadge(id: Long, widgetChannelsList: WidgetChannelsList) {
         if (widgetChannelsList.view == null || lastSetGuild == id) return
+
         lastSetGuild = id
+
         val badge = guildBadges[id]
         val binding = WidgetChannelsList.`access$getBinding$p`(widgetChannelsList)
         val toolbar = binding.g.parent as ViewGroup
+
         toolbar.findViewById<ImageView>(guildBadgeViewId)?.apply {
-            if (badge == null) visibility = View.GONE
-            else {
-                visibility = View.VISIBLE
+            visibility = if (badge == null) {
+                View.GONE
+            } else {
                 with(badge.getDrawableId()) {
-                    if (this != 0) setImageResource(this) else setImageUrl(
-                        badge.url ?: ""
-                    )
+                    if (this != 0) {
+                        setImageResource(this)
+                    } else {
+                        setImageUrl(badge.url.orEmpty())
+                    }
                 }
                 setOnClickListener { Utils.showToast(badge.text) }
+                View.VISIBLE
             }
         }
     }

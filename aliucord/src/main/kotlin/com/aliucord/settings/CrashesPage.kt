@@ -110,7 +110,7 @@ internal class CrashesPage : SettingsPage() {
 
         val res = linkedMapOf<Int, CrashLog>()
 
-        for (file in files) {
+        files.forEach { file ->
             val content = file.readText()
 
             res.getOrPut(content.hashCode()) {

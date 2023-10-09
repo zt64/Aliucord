@@ -17,10 +17,7 @@ public object IOUtils {
     @Throws(IOException::class)
     @JvmStatic
     public fun readAsText(`is`: InputStream): String {
-        ByteArrayOutputStream(`is`.available()).use { baos ->
-            pipe(`is`, baos)
-            return baos.toString("UTF-8")
-        }
+        return `is`.reader().use(InputStreamReader::readText)
     }
 
     /**

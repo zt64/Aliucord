@@ -8,13 +8,12 @@ import com.aliucord.*
 import com.aliucord.PluginManager.isPluginEnabled
 import com.aliucord.PluginManager.remountPlugin
 import com.aliucord.Utils.openPage
-import com.aliucord.Utils.pluralise
+import com.aliucord.Utils.pluralize
 import com.aliucord.Utils.promptRestart
 import com.aliucord.api.NotificationsAPI.display
 import com.aliucord.entities.NotificationData
 import com.aliucord.entities.Plugin
-import com.aliucord.settings.AUTO_UPDATE_ALIUCORD_KEY
-import com.aliucord.settings.AUTO_UPDATE_PLUGINS_KEY
+import com.aliucord.settings.*
 import com.aliucord.utils.MDUtils
 import com.google.gson.reflect.TypeToken
 import java.io.File
@@ -41,12 +40,12 @@ internal object PluginUpdater {
             if (checkPluginUpdate(v)) updates += k
         }
 
-        if (!notify || updates.size == 0 && !(!Updater.usingDexFromStorage() && Updater.isAliucordOutdated())) return
+        if (!notify || updates.isEmpty() && !(!Updater.usingDexFromStorage() && Updater.isAliucordOutdated())) return
         val notificationData = NotificationData()
             .setTitle("Updater")
             .setAutoDismissPeriodSecs(10)
             .setOnClick {
-                openPage(Utils.appActivity, com.aliucord.settings.UpdaterPage::class.java)
+                openPage(Utils.appActivity, UpdaterPage::class.java)
             }
         val updatablePlugins = updates.joinToString { "**$it**" }
         var body = if (Main.settings.getBool(AUTO_UPDATE_PLUGINS_KEY, false)) {
@@ -55,8 +54,9 @@ internal object PluginUpdater {
                 -1 -> {
                     "Something went wrong while auto updating plugins. Check the debug log for more info."
                 }
+
                 else -> {
-                    "Automatically updated ${pluralise(res, "plugin")}: $updatablePlugins"
+                    "Automatically updated ${pluralize(res, "plugin")}: $updatablePlugins"
                 }
             }
         } else if (updates.isNotEmpty()) {
@@ -69,6 +69,7 @@ internal object PluginUpdater {
                     Updater.isDiscordOutdated() -> {
                         body = "Your Base Discord is outdated. Please update using the installer - $body"
                     }
+
                     Updater.isAliucordOutdated() -> {
                         body = if (Main.settings.getBool(AUTO_UPDATE_ALIUCORD_KEY, false)) {
                             try {
@@ -159,7 +160,7 @@ internal object PluginUpdater {
     fun updateAll(): Int {
         var updateCount = 0
 
-        for (plugin in updates) {
+        updates.forEach { plugin ->
             try {
                 if (update(plugin) && updateCount != -1) updateCount++
             } catch (t: Throwable) {
@@ -189,8 +190,7 @@ internal object PluginUpdater {
         if (isPluginEnabled(plugin)) {
             Utils.mainThread.post {
                 remountPlugin(plugin)
-                val newPlugin = PluginManager.plugins[plugin]!!
-                if (newPlugin.requiresRestart()) promptRestart()
+                if (PluginManager.plugins[plugin]!!.requiresRestart()) promptRestart()
             }
         }
 
