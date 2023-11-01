@@ -38,9 +38,9 @@ jobs:
           cd $GITHUB_WORKSPACE/src
           ./gradlew :aliucord:make
           cp aliucord/build/zeetcord.zip $GITHUB_WORKSPACE/builds
-        env:
-          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+        # env:
+        #   MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+        #   MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
 
       - name: Push builds
         run: |
