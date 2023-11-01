@@ -31,7 +31,7 @@ internal const val TASK_GROUP = "aliucord"
 
 fun registerTasks(project: Project) {
     val extension = project.extensions.getAliucord()
-    val intermediates = project.buildDir.resolve("intermediates")
+    val intermediates = project.layout.buildDirectory.dir("intermediates").get()
 
     if (project.rootProject.tasks.findByName("generateUpdaterJson") == null) {
         project.rootProject.tasks.register<GenerateUpdaterJsonTask>("generateUpdaterJson") {
@@ -39,7 +39,7 @@ fun registerTasks(project: Project) {
 
             outputs.upToDateWhen { false }
 
-            outputFile.set(project.buildDir.resolve("updater.json"))
+            outputFile = project.layout.buildDirectory.file("updater.json")
         }
     }
 
@@ -47,12 +47,12 @@ fun registerTasks(project: Project) {
         group = TASK_GROUP
     }
 
-    val pluginClassFile = intermediates.resolve("pluginClass")
+    val pluginClassFile = intermediates.file("pluginClass").asFile
 
     val compileDex by project.tasks.registering(CompileDexTask::class) {
         group = TASK_GROUP
 
-        this.pluginClassFile.set(pluginClassFile)
+        this.pluginClassFile = pluginClassFile
 
         for (name in arrayOf("compileDebugJavaWithJavac", "compileDebugKotlin")) {
             val task = project.tasks.named(name).orNull
@@ -62,7 +62,7 @@ fun registerTasks(project: Project) {
             }
         }
 
-        outputFile.set(intermediates.resolve("classes.dex"))
+        outputFile = intermediates.file("classes.dex")
     }
 
     val compileResources by project.tasks.registering(CompileResourcesTask::class) {
@@ -72,10 +72,10 @@ fun registerTasks(project: Project) {
         dependsOn(processDebugManifest)
 
         val android = project.extensions.getByName<BaseExtension>("android")
-        input.set(android.sourceSets["main"].res.srcDirs.single())
-        manifestFile.set(processDebugManifest.manifestOutputFile)
+        input = android.sourceSets["main"].res.srcDirs.single()
+        manifestFile = processDebugManifest.manifestOutputFile
 
-        outputFile.set(intermediates.resolve("res.apk"))
+        outputFile = intermediates.file("res.apk")
 
         doLast {
             val resApkFile = outputFile.asFile.get()
@@ -92,8 +92,12 @@ fun registerTasks(project: Project) {
 
     project.afterEvaluate {
         project.tasks.register(
-            "make",
-            if (extension.projectType.get() == ProjectType.INJECTOR) Copy::class else Zip::class
+            name = "make",
+            type = if (extension.projectType.get() == ProjectType.INJECTOR) {
+                Copy::class
+            } else {
+                Zip::class
+            }
         ) {
             group = TASK_GROUP
 
@@ -101,7 +105,7 @@ fun registerTasks(project: Project) {
             dependsOn(compileDexTask)
 
             if (extension.projectType.get() == ProjectType.PLUGIN) {
-                val manifestFile = intermediates.resolve("manifest.json")
+                val manifestFile = intermediates.file("manifest.json").asFile
 
                 from(manifestFile)
                 doFirst {
@@ -142,19 +146,19 @@ fun registerTasks(project: Project) {
                 rename { return@rename "injector.dex" }
 
                 doLast {
-                    logger.lifecycle("Copied Injector.dex to ${project.layout.buildDirectory}")
+                    logger.lifecycle("Copied injector.dex to ${project.layout.buildDirectory}")
                 }
             } else {
                 this as Zip
 
                 dependsOn(compileResources.get())
                 isPreserveFileTimestamps = false
-                archiveBaseName.set(project.name)
-                archiveVersion.set("")
+                archiveBaseName = "zeetcord"
+                archiveVersion = ""
                 destinationDirectory.set(project.layout.buildDirectory)
 
                 doLast {
-                    logger.lifecycle("Made Aliucord package at ${outputs.files.singleFile}")
+                    logger.lifecycle("Made Zeetcord package at ${outputs.files.singleFile}")
                 }
             }
         }

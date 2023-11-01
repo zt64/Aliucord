@@ -15,24 +15,25 @@
 
 package com.aliucord.gradle.task
 
-import com.aliucord.gradle.ProjectType
-import com.aliucord.gradle.getAliucord
+import com.aliucord.gradle.*
 import com.android.build.gradle.BaseExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.options.Option
+import org.gradle.kotlin.dsl.getByName
 import se.vidstige.jadb.*
-import java.nio.charset.StandardCharsets
 
 abstract class DeployWithAdbTask : DefaultTask() {
     @get:Input
     @set:Option(option = "wait-for-debugger", description = "Enables debugging flag when starting the discord activity")
     var waitForDebugger: Boolean = false
 
+
     @TaskAction
     fun deployWithAdb() {
-        val extension = project.extensions.getAliucord()
-        val android = project.extensions.getByName("android") as BaseExtension
+        val android: BaseExtension = project.extensions.getByName<BaseExtension>("android")
+        val aliucord: AliucordExtension = project.extensions.getAliucord()
+        val makeTask = project.tasks.getByName<AbstractCopyTask>("make")
 
         AdbServerLauncher(Subprocess(), android.adbExecutable.absolutePath).launch()
         val jadbConnection = JadbConnection()
@@ -48,31 +49,26 @@ abstract class DeployWithAdbTask : DefaultTask() {
             "Only one ADB device should be connected, but ${devices.size} were!"
         }
 
-        val device = devices[0]
+        var file = makeTask.outputs.files.singleFile
 
-        val make = project.tasks.getByName("make") as AbstractCopyTask
-
-        var file = make.outputs.files.singleFile
-
-        if (extension.projectType.get() == ProjectType.INJECTOR) {
-            file = file.resolve("Injector.dex")
+        if (aliucord.projectType.get() == ProjectType.INJECTOR) {
+            file = file.resolve("injector.dex")
         }
 
-        var path = "/storage/emulated/0/Aliucord/"
+        var path = "/storage/emulated/0/Zeetcord"
 
-        if (extension.projectType.get() == ProjectType.PLUGIN) path += "plugins/"
+        if (aliucord.projectType.get() == ProjectType.PLUGIN) path += "/plugins/"
 
-        device.push(file, RemoteFile(path + file.name))
+        val device = devices.first()
 
-        if (extension.projectType.get() != ProjectType.INJECTOR) {
+        device.push(file, RemoteFile("$path/${file.name}"))
+
+        if (aliucord.projectType.get() != ProjectType.INJECTOR) {
             val args = arrayListOf("start", "-S", "-n", "com.aliucord/com.discord.app.AppActivity\$Main")
 
             if (waitForDebugger) args += "-D"
 
-            val response = String(
-                device.executeShell("am", *args.toTypedArray()).readAllBytes(),
-                StandardCharsets.UTF_8
-            )
+            val response = device.executeShell("am", *args.toTypedArray()).readAllBytes().decodeToString()
 
             if ("Error" in response) logger.error(response)
         }

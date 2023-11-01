@@ -123,8 +123,9 @@ public object RxUtils {
      * @param callback the callback to run after the delay
      */
     @JvmStatic
-    public fun schedule(delay: Long, unit: TimeUnit?, callback: Long.() -> Unit): Subscription =
-        timer(delay, unit).subscribe(callback)
+    public fun schedule(delay: Long, unit: TimeUnit?, callback: Long.() -> Unit): Subscription {
+        return timer(delay, unit).subscribe(callback)
+    }
 
     /**
      * Combines a list of source Observables by emitting an item that aggregates the latest values of each of

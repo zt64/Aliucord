@@ -69,7 +69,7 @@ class _InstallPageState extends State<InstallPage> {
       final dexFile = File(prefs.getString('dex_location') ?? defaultDexLocation);
       if (await dexFile.exists()) {
         await dexFile.copy(aliucordDex);
-        final manifestFile = File('${storageRoot.path}/Aliucord/AndroidManifest.xml');
+        final manifestFile = File('${storageRoot.path}/Zeetcord/AndroidManifest.xml');
         if (await manifestFile.exists()) {
           await manifestFile.copy('$cache/AndroidManifest.xml');
           downloadManifest = false;
@@ -88,7 +88,7 @@ class _InstallPageState extends State<InstallPage> {
     try {
       await patchApk(apk, prefs.getBool('replace_bg') ?? true);
       await signApk();
-      installApk('${storageRoot.path}/Aliucord/Aliucord.apk');
+      installApk('${storageRoot.path}/Zeetcord/Zeetcord.apk');
       // ignore: use_build_context_synchronously
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
     } on PlatformException catch (e) {
@@ -99,8 +99,8 @@ class _InstallPageState extends State<InstallPage> {
 
   Future<bool> _downloadAliucord(String out) async {
     if ((prefs.getString('dex_commit') ?? '') == widget.commit && await File(out).exists()) return true;
-    setState(() => _logs += 'Downloading Injector.dex..\n');
-    final url = githubAPI!.getDownloadUrl(widget.commit, 'Injector.dex');
+    setState(() => _logs += 'Downloading injector.dex..\n');
+    final url = githubAPI!.getDownloadUrl(widget.commit, 'injector.dex');
     try {
       await dio.download(url, out, onReceiveProgress: (count, total) => setState(() => _progress = count / total));
       setState(() {

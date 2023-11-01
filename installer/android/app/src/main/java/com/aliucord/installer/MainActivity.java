@@ -42,7 +42,7 @@ public final class MainActivity extends FlutterActivity {
         MethodChannel updaterChannel = new MethodChannel(binaryMessenger, "updater");
         Handler handler = new Handler(Looper.getMainLooper());
         Action1<String> updater = state -> {
-            Log.d("Aliucord Installer", state);
+            Log.d("Zeetcord Installer", state);
             handler.post(() -> updaterChannel.invokeMethod("updateState", state));
         };
 
@@ -110,9 +110,9 @@ public final class MainActivity extends FlutterActivity {
                     new Thread(() -> {
                         String path = methodCall.argument("path");
                         if (path == null) return;
-                        File outApkDir = new File(Environment.getExternalStorageDirectory(), "Aliucord");
+                        File outApkDir = new File(Environment.getExternalStorageDirectory(), "Zeetcord");
                         if (!outApkDir.exists()) outApkDir.mkdirs();
-                        String outApk = outApkDir.getAbsolutePath() + "/Aliucord.apk";
+                        String outApk = outApkDir.getAbsolutePath() + "/Zeetcord.apk";
 
                         try {
                             File aliucordDex = new File(getFilesDir(), "classes.dex");
@@ -195,7 +195,7 @@ public final class MainActivity extends FlutterActivity {
                             }
                             handler.post(() -> result.success(null));
                         } catch (Throwable e) {
-                            Log.e("Aliucord Installer", null, e);
+                            Log.e("Zeetcord Installer", null, e);
                             handler.post(() -> result.error("patchApk", e.toString(), Utils.stackTraceToString(e.getStackTrace())));
                         }
                     }).start();
@@ -204,10 +204,10 @@ public final class MainActivity extends FlutterActivity {
                     updater.call("Signing apk file");
                     new Thread(() -> {
                         try {
-                            Signer.signApk(new File(Environment.getExternalStorageDirectory(), "Aliucord/Aliucord.apk"));
+                            Signer.signApk(new File(Environment.getExternalStorageDirectory(), "Zeetcord/Zeetcord.apk"));
                             handler.post(() -> result.success(null));
                         } catch (Throwable e) {
-                            Log.e("Aliucord Installer", null, e);
+                            Log.e("Zeetcord Installer", null, e);
                             handler.post(() -> result.error("signApk", e.toString(), Utils.stackTraceToString(e.getStackTrace())));
                         }
                     }).start();
@@ -229,7 +229,7 @@ public final class MainActivity extends FlutterActivity {
                     }
                     break;
                 case "checkKeystoreDeleted":
-                    if (new File(Environment.getExternalStorageDirectory(), "Aliucord/ks.keystore").exists()) {
+                    if (new File(Environment.getExternalStorageDirectory(), "Zeetcord/ks.keystore").exists()) {
                         result.success(false);
                     } else try {
                         getPackageManager().getPackageInfo("com.aliucord", 0);

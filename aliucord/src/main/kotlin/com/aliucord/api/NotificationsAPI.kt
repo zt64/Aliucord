@@ -15,6 +15,7 @@ public object NotificationsAPI {
      * @param data [NotificationData]
      * @see NotificationsAPI.display
      */
+    @JvmStatic
     @JvmOverloads
     public fun display(data: NotificationData, channelId: Long? = null) {
         NoticePopup.`enqueue$default`(

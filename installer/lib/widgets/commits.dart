@@ -31,7 +31,7 @@ class _CommitsWidgetState extends State<CommitsWidget> {
   bool _initialized = false;
 
   void _getCommits() async {
-    final buildCommits = await githubAPI!.getCommits(params: { 'sha': 'builds', 'path': 'Injector.dex', 'per_page': '50' });
+    final buildCommits = await githubAPI!.getCommits(params: { 'sha': 'builds', 'path': 'injector.dex', 'per_page': '50' });
     final commits = await githubAPI!.getCommits(params: { 'per_page': '50' });
     _commits = commits.map((c) => _CommitData(c, buildCommits.firstWhereOrNull((bc) => bc.commit.message.substring(6) == c.sha)?.sha)).toList();
     setState(() => _initialized = true);

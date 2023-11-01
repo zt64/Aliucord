@@ -15,6 +15,11 @@ import java.util.UUID
 
 @Suppress("MemberVisibilityCanBePrivate")
 public object RNSuperProperties {
+    // update to latest Beta branch sometimes
+    public const val VERSION_CODE: Int = 183109
+    public const val VERSION_STRING: String = "183.9 - rn"
+    public const val USER_AGENT: String = "Discord-Android/$VERSION_CODE;RNA"
+
     // vendorId is a random UUID even in normal Discord RN
     @JvmStatic
     public val vendorId: String = Main.settings.getString("rnVendorId", null) ?: UUID.randomUUID().toString().also {
@@ -40,9 +45,4 @@ public object RNSuperProperties {
 
     @JvmStatic
     public val superPropertiesBase64: String = Base64.encodeToString(superProperties.toString().toByteArray(), 2)
-
-    // update to latest Beta branch sometimes
-    public const val VERSION_CODE: Int = 183109
-    public const val VERSION_STRING: String = "183.9 - rn"
-    public const val USER_AGENT: String = "Discord-Android/$VERSION_CODE;RNA"
 }

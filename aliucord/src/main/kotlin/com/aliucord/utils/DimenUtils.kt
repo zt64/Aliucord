@@ -37,7 +37,6 @@ public object DimenUtils {
     public val Float.dp: Int
         inline get() = dpToPx(this)
 
-
     /**
      * Converts DP to PX.
      * @param dp DP value

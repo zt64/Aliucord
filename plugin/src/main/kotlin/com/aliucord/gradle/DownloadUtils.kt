@@ -22,9 +22,7 @@ import org.gradle.internal.logging.progress.ProgressLogger
 import org.gradle.internal.logging.progress.ProgressLoggerFactory
 import org.gradle.internal.service.ServiceRegistry
 import java.io.File
-import java.io.FileOutputStream
 import java.net.URL
-
 
 fun createProgressLogger(project: Project, loggerCategory: String): ProgressLogger {
     return createProgressLogger((project as ProjectInternal).services, loggerCategory)
@@ -43,15 +41,14 @@ fun URL.download(file: File, progressLogger: ProgressLogger) {
         tempFile.deleteOnExit()
 
         val connection = this.openConnection()
-        val size = connection.contentLengthLong
-        val sizeText = toLengthText(size)
+        val sizeText = toLengthText(connection.contentLengthLong)
 
         connection.getInputStream().use { inputStream ->
             var finished = false
             var processedBytes: Long = 0
             try {
-                FileOutputStream(tempFile).use { os ->
-                    val buf = ByteArray(1024 * 10)
+                tempFile.outputStream().use { os ->
+                    val buf = ByteArray(1024 * 10) // 10 KiB
                     var read: Int
                     while (inputStream.read(buf).also { read = it } >= 0) {
                         os.write(buf, 0, read)
@@ -72,7 +69,7 @@ fun URL.download(file: File, progressLogger: ProgressLogger) {
 
 private fun toLengthText(bytes: Long): String = when {
     bytes < 1024 -> "$bytes B"
-    bytes < 1024 * 1024 -> "${(bytes / 1024)} KB"
+    bytes < 1024 * 1024 -> "${bytes / 1024} KB"
     bytes < 1024 * 1024 * 1024 -> "%.2f MB".format(bytes / (1024.0 * 1024.0))
     else -> "%.2f GB".format(bytes / (1024.0 * 1024.0 * 1024.0))
 }

@@ -16,13 +16,17 @@
 package com.aliucord.gradle.task
 
 import com.android.build.gradle.BaseExtension
+import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.*
 import org.gradle.internal.os.OperatingSystem
+import org.gradle.kotlin.dsl.getByName
+import org.gradle.process.ExecOperations
 import java.io.File
+import javax.inject.Inject
 
-abstract class CompileResourcesTask : Exec() {
+abstract class CompileResourcesTask : DefaultTask() {
     @get:InputDirectory
     @get:SkipWhenEmpty
     @get:IgnoreEmptyDirectories
@@ -34,8 +38,12 @@ abstract class CompileResourcesTask : Exec() {
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
-    override fun exec() {
-        val android = project.extensions.getByName("android") as BaseExtension
+    @get:Inject
+    abstract val execOperatations: ExecOperations
+
+    @TaskAction
+    fun action() {
+        val android = project.extensions.getByName<BaseExtension>("android")
 
         val aaptExecutable = android.sdkDirectory.resolve("build-tools")
             .resolve(android.buildToolsVersion)
@@ -43,29 +51,23 @@ abstract class CompileResourcesTask : Exec() {
 
         val tmpRes = File.createTempFile("res", ".zip")
 
-        execActionFactory.newExecAction().apply {
+        execOperatations.exec {
             executable = aaptExecutable.path
             args("compile")
             args("--dir", input.asFile.get().path)
             args("-o", tmpRes.path)
-            execute()
         }
-
-        execActionFactory.newExecAction().apply {
+        execOperatations.exec {
             executable = aaptExecutable.path
             args("link")
             args(
                 "-I",
-                android.sdkDirectory
-                    .resolve("platforms")
-                    .resolve(android.compileSdkVersion!!)
-                    .resolve("android.jar")
+                android.sdkDirectory.resolve("platforms/${android.compileSdkVersion}/android.jar")
             )
             args("-R", tmpRes.path)
             args("--manifest", manifestFile.asFile.get().path)
             args("-o", outputFile.asFile.get().path)
             args("--auto-add-overlay")
-            execute()
         }
 
         tmpRes.delete()

@@ -2,7 +2,6 @@
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     `maven-publish`
@@ -13,7 +12,7 @@ plugins {
 }
 
 aliucord {
-    projectType.set(com.aliucord.gradle.ProjectType.CORE)
+    projectType = com.aliucord.gradle.ProjectType.CORE
 }
 
 kotlin {
@@ -23,7 +22,7 @@ kotlin {
 
 android {
     namespace = "com.aliucord"
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         minSdk = 24
         buildConfigField("String", "GIT_REVISION", "\"${getGitHash()}\"")
@@ -62,8 +61,8 @@ tasks {
         it.configure {
             dokkaSourceSets {
                 named("main") {
-                    noAndroidSdkLink.set(false)
-                    includeNonPublic.set(false)
+                    noAndroidSdkLink = false
+                    includeNonPublic = false
                 }
             }
         }
@@ -71,11 +70,11 @@ tasks {
     create("pushDebuggable") {
         group = "aliucord"
 
-        val aliucordPath = "/storage/emulated/0/Aliucord/"
+        val aliucordPath = "/storage/emulated/0/Zeetcord"
 
         doLast {
             exec {
-                commandLine(android.adbExecutable, "shell", "touch", "$aliucordPath.debuggable")
+                commandLine(android.adbExecutable, "shell", "touch", "$aliucordPath/.debuggable")
             }
 
             exec {
@@ -83,7 +82,7 @@ tasks {
                     android.adbExecutable,
                     "push",
                     rootProject.file(".assets/AndroidManifest-debuggable.xml"),
-                    "${aliucordPath}AndroidManifest.xml"
+                    "${aliucordPath}/AndroidManifest.xml"
                 )
             }
         }
@@ -119,11 +118,8 @@ afterEvaluate {
 }
 
 fun getGitHash(): String {
-    val stdout = org.apache.commons.io.output.ByteArrayOutputStream()
-    exec {
+    return providers.exec {
         commandLine = listOf("git", "rev-parse", "--short", "HEAD")
-        standardOutput = stdout
         isIgnoreExitValue = true
-    }
-    return stdout.toString().trim()
+    }.standardOutput.asText.get().trim()
 }

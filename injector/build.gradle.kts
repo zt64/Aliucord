@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+import com.aliucord.gradle.task.CompileDexTask
+
+
 plugins {
     com.aliucord.core
 }

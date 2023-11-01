@@ -12,9 +12,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import com.aliucord.Constants
-import com.aliucord.Main
-import com.aliucord.Utils
+import com.aliucord.*
 import com.aliucord.fragments.SettingsPage
 import com.discord.stores.StoreStream
 import com.discord.views.CheckedSetting
@@ -31,27 +29,27 @@ internal class AliucordSettingsPage : SettingsPage() {
     override fun onViewBound(view: View) {
         super.onViewBound(view)
 
-        setActionBarTitle("Aliucord")
-        setActionBarSubtitle("Aliucord Settings")
+        setActionBarTitle("Zeetcord")
+        setActionBarSubtitle("Zeetcord Settings")
 
         val ctx = view.context
 
-        addHeader(text = "Aliucord Settings")
+        addHeader("Zeetcord Settings")
         addSwitch(
             AUTO_DISABLE_ON_CRASH_KEY,
             "Automatically disable plugins on crash",
             "When a plugin is found to be causing crashes, it will automatically be disabled",
             true
         )
-        addSwitch(AUTO_UPDATE_ALIUCORD_KEY, "Automatically update Aliucord")
+        addSwitch(AUTO_UPDATE_ALIUCORD_KEY, "Automatically update Zeetcord")
         addSwitch(AUTO_UPDATE_PLUGINS_KEY, "Automatically update plugins")
 
         if (StoreStream.getUserSettings().isDeveloperMode) {
             addDivider(ctx)
-            addHeader(text = "Developer Settings")
+            addHeader("Developer Settings")
             addSwitch(
                 ALIUCORD_FROM_STORAGE_KEY,
-                "Use Aliucord from storage",
+                "Use Zeetcord from storage",
                 "Meant for developers. Do not enable unless you know what you're doing. If someone else is telling you to do this, you are likely being scammed."
             )
         }
@@ -61,15 +59,6 @@ internal class AliucordSettingsPage : SettingsPage() {
         addLink("Source Code", R.e.ic_account_github_white_24dp) {
             Utils.launchUrl(Constants.ALIUCORD_GITHUB_REPO)
         }
-        addLink("Support Server", R.e.ic_help_24dp) {
-            Utils.joinSupportServer(it.context)
-        }
-        addLink("Support us on Patreon", R.e.ic_heart_24dp) {
-            Utils.launchUrl(Constants.ALIUCORD_PATREON)
-        }
-        /*addLink(ctx, "... or on OnlyFans", R.e.ic_heart_24dp) {
-            Utils.launchUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-        }*/
     }
 
     private fun addSwitch(

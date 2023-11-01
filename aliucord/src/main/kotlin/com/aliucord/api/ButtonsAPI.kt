@@ -41,7 +41,7 @@ public object ButtonsAPI {
      * @param button The data to create the button with
      */
     @JvmStatic
-    public fun Message.addButton(button: ButtonData): Unit = this.addButton(button.label, button.style, button.onPress)
+    public fun Message.addButton(button: ButtonData): Unit = addButton(button.label, button.style, button.onPress)
 
     /**
      * Adds a button component to the message.
@@ -52,12 +52,12 @@ public object ButtonsAPI {
     @JvmStatic
     public fun Message.addButton(label: String, style: ButtonStyle, onPress: (Message, FragmentActivity) -> Unit) {
         val id = (-CommandsAPI.generateId()).toString()
-        val components = this.components ?: ArrayList<Component>().also { components ->
+        val components = this.components ?: arrayListOf<Component>().also { components ->
             msgComponentsField[this] = components
         }
 
         try {
-            val buttonComponent = ReflectUtils.allocateInstance(ButtonComponent::class.java) as ButtonComponent
+            val buttonComponent = ReflectUtils.allocateInstance<ButtonComponent>()!!
 
             labelField[buttonComponent] = label
             styleField[buttonComponent] = style
@@ -65,12 +65,12 @@ public object ButtonsAPI {
             typeField[buttonComponent] = ComponentType.BUTTON
             idField[buttonComponent] = "${-CommandsAPI.ALIUCORD_APP_ID}-${id}"
 
-            val row = components.lastOrNull() ?: ReflectUtils.allocateInstance(ActionRowComponent::class.java).also { row ->
+            val row = components.lastOrNull() ?: ReflectUtils.allocateInstance<ActionRowComponent>()!!.also { row ->
                 arTypeField[row] = ComponentType.ACTION_ROW
                 components += row
             }
 
-            val rowItems = componentsField[row] as ArrayList<Component>? ?: ArrayList<Component>().also { rowItems ->
+            val rowItems = componentsField[row] as ArrayList<Component>? ?: arrayListOf<Component>().also { rowItems ->
                 componentsField[row] = rowItems
             }
 

@@ -222,7 +222,7 @@ class CommandsAPI internal constructor(
         const val DONT_SEND_RESULT = "{ALIUCORD_COMMAND}"
         private val logger = Logger("CommandsAPI")
         private val aliucordApplication =
-            Application(ALIUCORD_APP_ID, "Aliucord", null, R.e.ic_slash_command_24dp, 0, null, true)
+            Application(ALIUCORD_APP_ID, "Zeetcord", null, R.e.ic_slash_command_24dp, 0, null, true)
 
         /** List of all registered commands  */
         var commands: MutableMap<String, RemoteApplicationCommand> = HashMap()

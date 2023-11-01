@@ -1,6 +1,6 @@
 name: Feature Request
-description: Create a feature request for Aliucord itself. To request new plugins, please go to Aliucord/plugin-requests.
-labels: [enhancement]
+description: Create a feature request for Zeetcord itself. To request new plugins, please go to Zeetcord/plugin-requests.
+labels: [ enhancement ]
 body:
   - type: input
     id: discord

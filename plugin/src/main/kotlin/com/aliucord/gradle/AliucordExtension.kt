@@ -49,7 +49,7 @@ abstract class AliucordExtension @Inject constructor(val project: Project) {
 
     val excludeFromUpdaterJson = project.objects.property<Boolean>().convention(false)
 
-    val userCache = project.gradle.gradleUserHomeDir.resolve("caches").resolve("aliucord")
+    val userCache = project.gradle.gradleUserHomeDir.resolve("caches").resolve("zeetcord")
 
     var discord: DiscordInfo? = null
         internal set
@@ -59,7 +59,6 @@ abstract class AliucordExtension @Inject constructor(val project: Project) {
 
 class DiscordInfo(extension: AliucordExtension, val version: Int) {
     val cache = extension.userCache.resolve("discord")
-
     val apkFile = cache.resolve("discord-$version.apk")
     val jarFile = cache.resolve("discord-$version.jar")
 }

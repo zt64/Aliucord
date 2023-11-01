@@ -32,10 +32,10 @@ abstract class GenerateUpdaterJsonTask : DefaultTask() {
     fun generateUpdaterJson() {
         val map = hashMapOf<String, UpdateInfo>()
 
-        for (subproject in project.allprojects) {
-            val aliucord = subproject.extensions.findAliucord() ?: continue
+        project.allprojects.forEach { subproject ->
+            val aliucord = subproject.extensions.findAliucord() ?: return@forEach
 
-            if (aliucord.excludeFromUpdaterJson.get()) continue
+            if (aliucord.excludeFromUpdaterJson.get()) return@forEach
 
             map[subproject.name] = UpdateInfo(
                 aliucord.minimumDiscordVersion.orNull ?: aliucord.discord?.version,

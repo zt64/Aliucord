@@ -35,7 +35,7 @@ fun registerConfigurations(project: Project) {
                 "Only one '${provider.name}' dependency should be specified, but ${dependencies.size} were!"
             }
 
-            for (dependency in dependencies) provider.provide(project, dependency)
+            dependencies.forEach { provider.provide(project, it) }
         }
     }
 }

@@ -28,8 +28,8 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderStateMixin {
   static final List<CheckBoxData> _checkBoxes = [
-    CheckBoxData('replace_bg', 'Replace icon background with Aliucord\'s', true),
-    CheckBoxData('use_dex_from_storage', 'Use Injector.dex from storage', false),
+    CheckBoxData('replace_bg', 'Replace icon background with Zeetcord\'s', true),
+    CheckBoxData('use_dex_from_storage', 'Use injector.dex from storage', false),
     CheckBoxData('developer_mode', 'Developer Mode', false),
   ];
   int _theme = 0;
@@ -72,7 +72,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
             subtitle: Text(_dexLocation),
             enabled: prefs.getBool('use_dex_from_storage') ?? false,
             onTap: () async {
-              final path = await pickFile(context, 'Select Injector.dex', '.dex');
+              final path = await pickFile(context, 'Select injector.dex', '.dex');
               if (path != null) {
                 prefs.setString('dex_location', path);
                 setState(() => _dexLocation = path);
@@ -92,7 +92,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(7),
               ),
-              child: const Text('Clear files cache (Injector.dex and patched manifest)', textAlign: TextAlign.center),
+              child: const Text('Clear files cache (injector.dex and patched manifest)', textAlign: TextAlign.center),
             ),
           ),
         ],

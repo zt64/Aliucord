@@ -15,6 +15,7 @@
 
 package com.aliucord.gradle.task
 
+import com.aliucord.gradle.AliucordExtension
 import com.aliucord.gradle.getAliucord
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.errors.MessageReceiverImpl
@@ -26,7 +27,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.*
-import org.gradle.kotlin.dsl.getByName
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.tree.ClassNode
 import org.slf4j.LoggerFactory
@@ -49,8 +49,9 @@ abstract class CompileDexTask : DefaultTask() {
     @Suppress("UnstableApiUsage")
     @TaskAction
     fun compileDex() {
-        val android = project.extensions.getByName<BaseExtension>("android")
+        val android: BaseExtension = project.extensions.getByName("android") as BaseExtension
 
+        val aliucord: AliucordExtension = project.extensions.getAliucord()
         val dexOutputDir = outputFile.get().asFile.parentFile!!
 
         Closer.create().use { closer ->
@@ -81,22 +82,19 @@ abstract class CompileDexTask : DefaultTask() {
                     val files = classesInput.collect(Collectors.toList())
 
                     dexBuilder.convert(
-                        files.stream(),
-                        dexOutputDir.toPath(),
-                        null,
+                        input = files.stream(),
+                        dexOutput = dexOutputDir.toPath(),
+                        globalSyntheticsOutput = null,
                     )
 
-                    for (file in files) {
+                    files.forEach { file ->
                         val reader = ClassReader(file.readAllBytes())
-
                         val classNode = ClassNode()
                         reader.accept(classNode, 0)
 
                         for (annotation in classNode.visibleAnnotations.orEmpty() + classNode.invisibleAnnotations.orEmpty()) {
                             if (annotation.desc == "Lcom/aliucord/annotations/AliucordPlugin;") {
-                                val aliucord = project.extensions.getAliucord()
-
-                                require(aliucord.pluginClassName == null) {
+                                requireNotNull(aliucord.pluginClassName) {
                                     "Only 1 active plugin class per project is supported"
                                 }
 

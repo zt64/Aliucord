@@ -324,7 +324,7 @@ public object Http {
         init {
             conn = URL(url).openConnection() as HttpURLConnection
             conn.requestMethod = method.uppercase(Locale.getDefault())
-            conn.addRequestProperty("User-Agent", "Aliucord (https://github.com/Aliucord/Aliucord)")
+            conn.addRequestProperty("User-Agent", "Zeetcord (https://github.com/zt64/Zeetcord)")
         }
 
         /**

@@ -11,7 +11,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.*
 import android.widget.Toast
-import com.discord.BuildConfig
 import com.discord.app.AppActivity
 import dalvik.system.BaseDexClassLoader
 import de.robv.android.xposed.XC_MethodHook
@@ -25,11 +24,10 @@ import kotlin.concurrent.thread
 import kotlin.reflect.KClass
 
 private const val BASE_URL = "https://raw.githubusercontent.com/zt64/zeetcord/builds"
-private const val DEX_URL = "$BASE_URL/aliucord.zip"
-private const val DISCORD_VERSION = 126021
+private const val DEX_URL = "$BASE_URL/zeetcord.zip"
 private const val ALIUCORD_FROM_STORAGE_KEY = "AC_from_storage"
 
-private val BASE_DIRECTORY = Environment.getExternalStorageDirectory().resolve("Aliucord")
+private val BASE_DIRECTORY = Environment.getExternalStorageDirectory().resolve("Zeetcord")
 
 fun init() {
     lateinit var unhook: XC_MethodHook.Unhook
@@ -48,41 +46,28 @@ fun init() {
             }
         )
     } catch (th: Throwable) {
-        Logger.e("Failed to initialize Aliucord", th)
+        Logger.e("Failed to initialize Zeetcord", th)
     }
 }
 
 private fun init(appActivity: AppActivity) {
-    if (!XposedBridge.disableProfileSaver())
-        Logger.w("Failed to disable profile saver")
+    if (!XposedBridge.disableProfileSaver()) Logger.w("Failed to disable profile saver")
+    if (!XposedBridge.disableHiddenApiRestrictions()) Logger.w("Failed to disable hidden api restrictions")
+    if (!pruneArtProfile(appActivity)) Logger.w("Failed to prune art profile")
 
-    if (!XposedBridge.disableHiddenApiRestrictions())
-        Logger.w("Failed to disable hidden api restrictions")
-
-    if (!pruneArtProfile(appActivity))
-        Logger.w("Failed to prune art profile")
-
-    Logger.d("Initializing Aliucord...")
+    Logger.d("Initializing Zeetcord...")
 
     try {
-        val dexFile = File(appActivity.codeCacheDir, "aliucord.zip")
+        val dexFile = File(appActivity.codeCacheDir, "zeetcord.zip")
 
         if (!useLocalDex(appActivity, dexFile) && !dexFile.exists()) {
             val successRef = AtomicBoolean(true)
 
             thread {
                 try {
-                    if (DISCORD_VERSION > BuildConfig.VERSION_CODE) {
-                        error(
-                            appActivity,
-                            "Your base Discord is outdated. Please reinstall using the Installer."
-                        )
-                        successRef.set(false)
-                    } else {
-                        downloadLatestAliucordDex(dexFile)
-                    }
+                    downloadLatestAliucordDex(dexFile)
                 } catch (e: Throwable) {
-                    error(appActivity, "Failed to install aliucord :(", e)
+                    error(appActivity, "Failed to install Zeetcord :(", e)
                     successRef.set(false)
                 }
             }.join()
@@ -90,20 +75,20 @@ private fun init(appActivity: AppActivity) {
             if (!successRef.get()) return
         }
 
-        Logger.d("Adding Aliucord to the classpath...")
+        Logger.d("Adding Zeetcord to the classpath...")
         addDexToClasspath(dexFile, appActivity.classLoader)
 
         val c = Class.forName("com.aliucord.Main")
         val preInit = c.getDeclaredMethod("preInit", AppActivity::class.java)
         val init = c.getDeclaredMethod("init", AppActivity::class.java)
 
-        Logger.d("Invoking main Aliucord entry point...")
+        Logger.d("Invoking main Zeetcord entry point...")
         preInit(null, appActivity)
         init(null, appActivity)
-        Logger.d("Finished initializing Aliucord")
+        Logger.d("Finished initializing Zeetcord")
     } catch (th: Throwable) {
         error(appActivity, "Failed to initialize Zeetcord", th)
-        appActivity.codeCacheDir.resolve("aliucord.zip").delete()
+        appActivity.codeCacheDir.resolve("zeetcord.zip").delete()
     }
 }
 
@@ -113,7 +98,7 @@ private fun init(appActivity: AppActivity) {
 private fun useLocalDex(appActivity: AppActivity, dexFile: File): Boolean {
     if (appActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) return false
 
-    val settingsFile = BASE_DIRECTORY.resolve("settings/Aliucord.json")
+    val settingsFile = BASE_DIRECTORY.resolve("settings/zeetcord.json")
         .takeIf(File::exists) ?: return false
 
     val useLocalDex = settingsFile.readText().let {
@@ -123,7 +108,7 @@ private fun useLocalDex(appActivity: AppActivity, dexFile: File): Boolean {
     }
 
     if (useLocalDex) {
-        BASE_DIRECTORY.resolve("aliucord.zip").run {
+        BASE_DIRECTORY.resolve("zeetcord.zip").run {
             if (exists()) {
                 Logger.d("Loading dex from $absolutePath")
                 copyTo(dexFile, true)
@@ -136,20 +121,20 @@ private fun useLocalDex(appActivity: AppActivity, dexFile: File): Boolean {
 }
 
 /**
- * Public so it can be manually triggered from Aliucord to update itself
- * outputFile should be new File(context.getCodeCacheDir(), "Aliucord.zip");
+ * Public so it can be manually triggered from Zeetcord to update itself
+ * outputFile should be new File(context.getCodeCacheDir(), "Zliucord.zip");
  */
 fun downloadLatestAliucordDex(outputFile: File) {
-    Logger.d("Downloading aliucord.zip from $DEX_URL...")
+    Logger.d("Downloading zeetcord.zip from $DEX_URL...")
     URL(DEX_URL).openStream().use {
         it.copyTo(outputFile.outputStream())
     }
-    Logger.d("Finished downloading aliucord.zip")
+    Logger.d("Finished downloading zeetcord.zip")
 }
 
 @Suppress("DiscouragedPrivateApi") // this private api seems to be stable, thanks to facebook who use it in the facebook app
 private fun addDexToClasspath(dex: File, classLoader: ClassLoader) {
-    Logger.d("Adding Aliucord to the classpath...")
+    Logger.d("Adding Zeetcord to the classpath...")
 
     // https://android.googlesource.com/platform/libcore/+/58b4e5dbb06579bec9a8fc892012093b6f4fbe20/dalvik/src/main/java/dalvik/system/BaseDexClassLoader.java#59
     val pathList = BaseDexClassLoader::class["pathList"][classLoader]!!
@@ -158,7 +143,7 @@ private fun addDexToClasspath(dex: File, classLoader: ClassLoader) {
         .apply { isAccessible = true }
     addDexPath(pathList, dex.absolutePath, null)
 
-    Logger.d("Successfully added Aliucord to the classpath")
+    Logger.d("Successfully added Zeetcord to the classpath")
 }
 
 /**

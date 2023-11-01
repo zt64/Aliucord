@@ -64,7 +64,7 @@ public object Utils {
      * as spinning up new Threads everytime is heavy on the CPU
      */
     @JvmField
-    public val threadPool: ExecutorService = Executors.newCachedThreadPool() as ExecutorService
+    public val threadPool: ExecutorService = Executors.newCachedThreadPool()
 
     @JvmStatic
     public lateinit var appActivity: AppActivity

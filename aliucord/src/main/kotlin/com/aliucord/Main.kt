@@ -82,7 +82,7 @@ public object Main {
     public lateinit var settings: SettingsUtilsJSON
 
     private fun preInitWithPermissions(activity: AppCompatActivity) {
-        settings = SettingsUtilsJSON("Aliucord")
+        settings = SettingsUtilsJSON("Zeetcord")
 
         CorePlugins.loadAll(activity)
         loadUserPlugins(activity)
@@ -173,7 +173,7 @@ public object Main {
             addView(Divider(context))
 
             val header = TextView(context, null, 0, R.i.UiKit_Settings_Item_Header).apply {
-                text = "Aliucord"
+                text = "Zeetcord"
                 typeface = ResourcesCompat.getFont(context, Fonts.WHITNEY_SEMIBOLD)
             }
 
@@ -215,7 +215,7 @@ public object Main {
             versionView.text = text
 
             layout.findViewById<TextView>(getResId("upload_debug_logs", "id")).apply {
-                text = "Aliucord Support Server"
+                text = "Zeetcord Support Server"
                 setOnClickListener { e -> joinSupportServer(e.context) }
             }
         }

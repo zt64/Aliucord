@@ -21,9 +21,9 @@ import com.googlecode.d2j.reader.MultiDexFileReader
 import groovy.json.JsonSlurper
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
+import org.gradle.kotlin.dsl.dependencies
 import java.lang.Integer.parseInt
 import java.net.URL
-import java.nio.file.Files
 
 class DiscordConfigurationProvider : IConfigurationProvider {
     private companion object {
@@ -38,13 +38,14 @@ class DiscordConfigurationProvider : IConfigurationProvider {
                 if (aliucordSnapshot == null) {
                     project.logger.lifecycle("Fetching discord version")
                     val data =
-                        JsonSlurper().parse(URL("https://raw.githubusercontent.com/Aliucord/Aliucord/builds/data.json")) as Map<*, *>
+                        JsonSlurper().parse(URL("https://raw.githubusercontent.com/zt64/Zeetcord/builds/data.json")) as Map<*, *>
                     aliucordSnapshot = parseInt(data["versionCode"] as String)
                     project.logger.lifecycle("Fetched discord version: $aliucordSnapshot")
                 }
 
                 aliucordSnapshot!!
             }
+
             else -> parseInt(dependency.version)
         }
 
@@ -64,10 +65,18 @@ class DiscordConfigurationProvider : IConfigurationProvider {
         if (!discord.jarFile.exists()) {
             project.logger.lifecycle("Converting discord apk to jar")
 
-            val reader = MultiDexFileReader.open(Files.readAllBytes(discord.apkFile.toPath()))
-            Dex2jar.from(reader).topoLogicalSort().skipDebug(false).noCode(true).to(discord.jarFile.toPath())
+            val reader = MultiDexFileReader.open(discord.apkFile.readBytes())
+
+            with(Dex2jar.from(reader)) {
+                topoLogicalSort()
+                skipDebug(false)
+                noCode(true)
+                to(discord.jarFile.toPath())
+            }
         }
 
-        project.dependencies.add("compileOnly", project.files(discord.jarFile))
+        project.dependencies {
+            "compileOnly"(project.files(discord.jarFile))
+        }
     }
 }

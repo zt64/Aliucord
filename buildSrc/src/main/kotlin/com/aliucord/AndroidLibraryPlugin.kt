@@ -20,7 +20,7 @@ class AndroidLibraryPlugin : Plugin<Project> {
 
             extensions.getByName<LibraryExtension>("android").apply {
                 namespace = "com.aliucord"
-                compileSdk = 33
+                compileSdk = 34
 
                 defaultConfig {
                     minSdk = 24
@@ -37,8 +37,8 @@ class AndroidLibraryPlugin : Plugin<Project> {
                 }
 
                 compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_11
-                    targetCompatibility = JavaVersion.VERSION_11
+                    sourceCompatibility = JavaVersion.VERSION_17
+                    targetCompatibility = JavaVersion.VERSION_17
                 }
             }
 
@@ -48,7 +48,6 @@ class AndroidLibraryPlugin : Plugin<Project> {
                 val discord by configurations
                 val implementation by configurations
                 discord(libs.discord)
-                // implementation("com.android.databinding:viewbinding:7.1.2")
             }
 
             tasks.withType<KotlinCompile> {

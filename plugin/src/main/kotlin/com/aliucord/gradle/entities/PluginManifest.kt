@@ -15,10 +15,7 @@
 
 package com.aliucord.gradle.entities
 
-data class Author(
-    val name: String,
-    val id: Long,
-)
+data class Author(val name: String, val id: Long)
 
 class Links : HashMap<String?, String?>() {
     private companion object {

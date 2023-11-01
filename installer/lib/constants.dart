@@ -5,5 +5,5 @@
  */
 
 const backendHost = 'https://aliucord.com/';
-const defaultDexLocation = '/storage/emulated/0/Aliucord/Injector.dex';
+const defaultDexLocation = '/storage/emulated/0/Zeetcord/injector.dex';
 const supportServer = 'EsNDvBaHVU';

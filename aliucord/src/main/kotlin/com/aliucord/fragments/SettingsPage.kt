@@ -40,7 +40,7 @@ public open class SettingsPage : AppFragment(resId) {
         super.onViewBound(view)
         this.view = view as CoordinatorLayout
 
-        setActionBarSubtitle("Aliucord")
+        setActionBarSubtitle("Zeetcord")
         setActionBarDisplayHomeAsUpEnabled()
 
         clear()
@@ -188,10 +188,14 @@ public open class SettingsPage : AppFragment(resId) {
      * @param context Context
      * @param text Header text
      */
-    protected fun addHeader(context: Context = getContext(), text: String?) {
+    protected fun addHeader(context: Context, text: String?) {
         val header = TextView(context, null, 0, R.i.UiKit_Settings_Item_Header)
         header.text = text
         addView(header)
+    }
+
+    protected fun addHeader(text: String?) {
+        addHeader(requireContext(), text)
     }
 
     /** Adds a view to the LinearLayout associated with this Page  */

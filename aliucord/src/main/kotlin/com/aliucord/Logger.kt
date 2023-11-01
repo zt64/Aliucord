@@ -14,7 +14,7 @@ import com.discord.app.AppLog
  * @param module Name of the module
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-public class Logger(public var module: String = "Aliucord") {
+public class Logger(public var module: String = "Zeetcord") {
     private fun format(msg: String) = "[$module] $msg"
 
     /**
@@ -65,7 +65,7 @@ public class Logger(public var module: String = "Aliucord") {
      * @param msg Message to log
      * @param throwable Exception to log
      */
-    public fun error(msg: String, throwable: Throwable?): Unit = AppLog.g.e(format(msg), throwable, null)
+    public fun error(msg: String, throwable: Throwable? = null): Unit = AppLog.g.e(format(msg), throwable, null)
 
     /**
      * Logs an exception and shows the user a toast saying "Sorry, something went wrong. Please try again."

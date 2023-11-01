@@ -42,7 +42,7 @@ class _AppState extends State<MyApp> {
     return DynamicColorBuilder(
       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
         return MaterialApp(
-          title: 'Aliucord Installer',
+          title: 'Zeetcord Installer',
           theme: themeManager.applyMonet(Themes.lightTheme, lightDynamic),
           darkTheme: themeManager.applyMonet(Themes.darkTheme, darkDynamic),
           themeMode: themeManager.currentTheme(),

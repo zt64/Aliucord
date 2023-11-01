@@ -6,16 +6,14 @@
 package com.aliucord
 
 import android.os.Environment
-import com.aliucord.utils.ReflectUtils
-import com.discord.stores.StoreStream
 
 @Suppress("unused", "ConstPropertyName")
 public object Constants {
     /** Link to the Aliucord github repo  */
-    public const val ALIUCORD_GITHUB_REPO: String = "https://github.com/Aliucord/Aliucord"
+    public const val ALIUCORD_GITHUB_REPO: String = "https://github.com/zt64/Zeetcord"
 
     /** Link to Aliucord's Patreon  */
-    public const val ALIUCORD_PATREON: String = "https://patreon.com/Aliucord"
+    public const val ALIUCORD_PATREON: String = "https://github.com/sponsors/zt64"
 
     /** Code of the Aliucord discord server  */
     public const val ALIUCORD_SUPPORT: String = "EsNDvBaHVU"
@@ -30,7 +28,7 @@ public object Constants {
 
     /** Path of Aliucord folder  */
     @JvmField
-    public val BASE_PATH: String = Environment.getExternalStorageDirectory().resolve("Aliucord").absolutePath
+    public val BASE_PATH: String = Environment.getExternalStorageDirectory().resolve("Zeetcord").absolutePath
 
     /** Path of Plugin folder  */
     @JvmField
@@ -47,48 +45,11 @@ public object Constants {
     public const val NAMESPACE_ANDROID: String = "http://schemas.android.com/apk/res/android"
     public const val NAMESPACE_APP: String = "http://schemas.android.com/apk/res-auto"
 
-    /** The version int of the currently running Discord, currently {@value BuildConfig#DISCORD_VERSION}  */
-    @JvmField
-    public var DISCORD_VERSION: Int = try {
-        ReflectUtils.getField(
-            ReflectUtils.getField(
-                StoreStream.Companion.`access$getCollector$p`(StoreStream.Companion),
-                "clientVersion"
-            )!!,
-            "clientVersion"
-        ) as Int
-    } catch (e: Throwable) {
-        Main.logger.error("Failed to retrieve client version", e)
-        BuildConfig.DISCORD_VERSION
-    }
+    /** The version int of the currently running Discord, currently [BuildConfig.DISCORD_VERSION]  */
+    public const val DISCORD_VERSION: Int = BuildConfig.DISCORD_VERSION
 
-    /**
-     * The release suffix of the currently running Discord. Some methods have this as their suffix and it changes with release, so in those
-     * cases use `"someMethod$" + Constants.RELEASE_SUFFIX` with reflection so that it works on all releases.
-     * <hr></hr><br></br>
-     * <h3>One of</h3>
-     *
-     *  * app_productionGoogleRelease
-     *  * app_productionBetaRelease
-     *  * app_productionCanaryRelease
-     *
-     */
-    @JvmField
-    public var RELEASE_SUFFIX: String? = try {
-        // Calculate the third digit of the number:
-        //      101207 -> 2
-        //      101107 -> 1
-        //      101007 -> 0
-        val release = DISCORD_VERSION / 100 % 10
-        arrayOf(
-            "app_productionGoogleRelease",
-            "app_productionBetaRelease",
-            "app_productionCanaryRelease"
-        )[release]
-    } catch (e: Throwable) {
-        Main.logger.error("Failed to determine discord release. Defaulting to beta", e)
-        "app_productionBetaRelease"
-    }
+    // The release suffix of the currently running Discord.
+    public const val RELEASE_SUFFIX: String = "app_productionGoogleRelease"
 
     public object Icons {
         /** Clyde avatar  */

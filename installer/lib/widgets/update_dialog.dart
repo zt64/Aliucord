@@ -35,7 +35,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
   void _update() async {
     setState(() => _updating = true);
-    final outPath = '${storageRoot.path}/Aliucord/Installer.apk';
+    final outPath = '${storageRoot.path}/Zeetcord/Installer.apk';
     try {
       await dio.download(
         widget.downloadUrl,

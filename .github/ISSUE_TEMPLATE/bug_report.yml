@@ -1,6 +1,6 @@
 name: Bug/Crash Report
-description: Create a bug or crash report for Aliucord itself. To report bugs or crashes related to plugins, please go to our support server, or the plugin's repository and make an issue there instead.
-labels: [bug]
+description: Create a bug or crash report for Zeetcord itself. To report bugs or crashes related to plugins, please go to our support server, or the plugin's repository and make an issue there instead.
+labels: [ bug ]
 body:
   - type: input
     id: discord
@@ -23,7 +23,7 @@ body:
     attributes:
       label: What is the expected behaviour?
       description: Simply detail what the expected behaviour is.
-      placeholder: I expect Aliucord to open the ... page instead of ..., it prevents me from doing ... and it is annoying.
+      placeholder: I expect Zeetcord to open the ... page instead of ..., it prevents me from doing ... and it is annoying.
     validations:
       required: true
   - type: textarea

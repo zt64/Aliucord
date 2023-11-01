@@ -8,7 +8,6 @@ import android.content.Context
 import com.aliucord.*
 import com.aliucord.settings.ALIUCORD_FROM_STORAGE_KEY
 import com.aliucord.utils.ReflectUtils
-import java.io.File
 import java.io.IOException
 
 public object Updater {
@@ -29,7 +28,7 @@ public object Updater {
 
             if (versions.size > newVersions.size) return false
 
-            versions.indices.forEach { i ->
+            versions.indices.toList().forEach { i ->
                 val newInt = newVersions[i].toInt()
                 val oldInt = versions[i].toInt()
                 if (newInt > oldInt) return true
@@ -104,7 +103,7 @@ public object Updater {
             c!!,
             null,
             "downloadLatestAliucordDex",
-            ctx.codeCacheDir.resolve("Aliucord.zip")
+            ctx.codeCacheDir.resolve("Zeetcord.zip")
         )
     }
 
