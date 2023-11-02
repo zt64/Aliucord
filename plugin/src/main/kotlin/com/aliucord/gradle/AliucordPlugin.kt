@@ -26,7 +26,7 @@ abstract class AliucordPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.extensions.create<AliucordExtension>("aliucord", project)
 
-        registerTasks(project)
-        registerConfigurations(project)
+        project.registerTasks()
+        project.registerConfigurations()
     }
 }

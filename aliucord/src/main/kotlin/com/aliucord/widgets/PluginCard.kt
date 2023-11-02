@@ -35,9 +35,9 @@ internal class PluginCard(ctx: Context) : MaterialCardView(ctx) {
     val changeLogButton: ToolbarButton
 
     init {
-        setRadius(defaultCardRadius.toFloat())
+        radius = defaultCardRadius.toFloat()
         setCardBackgroundColor(ColorCompat.getThemedColor(ctx, R.b.colorBackgroundSecondary))
-        setLayoutParams(LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 
         val p = defaultPadding
         val p2 = p / 2

@@ -1,8 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import com.aliucord.gradle.task.CompileDexTask
-
-
 plugins {
     com.aliucord.core
 }
@@ -30,4 +27,8 @@ android {
 dependencies {
     implementation(libs.appcompat)
     implementation(libs.aliuhook)
+}
+
+tasks.register("patchApk") {
+
 }

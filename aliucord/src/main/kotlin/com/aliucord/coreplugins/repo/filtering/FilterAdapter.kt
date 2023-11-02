@@ -42,7 +42,7 @@ internal class FilterAdapter(fragment: AppFragment) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.item.type = FilterType.values()[position]
+        holder.item.type = FilterType.entries[position]
         when (holder.item.type) {
             FilterType.AUTHOR -> Utils.threadPool.execute {
                 developers = PluginRepoAPI.developers.toMutableList()

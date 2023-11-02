@@ -57,7 +57,7 @@ internal class UploadSize : Plugin(Manifest("UploadSize")) {
 
     @Suppress("UNCHECKED_CAST")
     override fun load(context: Context) {
-        patcher.instead<PremiumUtils>("getGuildMaxFileSizeMB", Int::class.java) { (_, tier: Int) ->
+        GlobalPatcher.instead<PremiumUtils>("getGuildMaxFileSizeMB", Int::class.java) { (_, tier: Int) ->
             when (tier) {
                 2 -> 50
                 3 -> 100
@@ -65,7 +65,7 @@ internal class UploadSize : Plugin(Manifest("UploadSize")) {
             }
         }
 
-        patcher.instead<PremiumUtils>("getMaxFileSizeMB", User::class.java) { (_, user: User) ->
+        GlobalPatcher.instead<PremiumUtils>("getMaxFileSizeMB", User::class.java) { (_, user: User) ->
             when (user.premiumTier!!) {
                 PremiumTier.TIER_1 -> 50 // Nitro Classic
                 PremiumTier.TIER_2 -> 500 // Nitro
@@ -73,7 +73,7 @@ internal class UploadSize : Plugin(Manifest("UploadSize")) {
             }
         }
 
-        patcher.instead<ImageUploadFailedDialog>("onViewBound", View::class.java) {
+        GlobalPatcher.instead<ImageUploadFailedDialog>("onViewBound", View::class.java) {
             val maxFileSize = argumentsOrDefault.getInt("PARAM_MAX_FILE_SIZE_MB")
 
             argumentsOrDefault.putInt("PARAM_MAX_FILE_SIZE_MB", 8)
@@ -94,7 +94,7 @@ internal class UploadSize : Plugin(Manifest("UploadSize")) {
         val contentResolverField = attachmentRequestBody.getDeclaredField("contentResolver").apply { isAccessible = true }
         val attachmentField = attachmentRequestBody.getDeclaredField("attachment").apply { isAccessible = true }
 
-        patcher.before<`MessageQueue$doSend$2`<*, *>>("call", ReadyToSend::class.java) { (it, payload: ReadyToSend) ->
+        GlobalPatcher.before<`MessageQueue$doSend$2`<*, *>>("call", ReadyToSend::class.java) { (it, payload: ReadyToSend) ->
             if (payload.uploads.isEmpty()) return@before
 
             val channelId = `$message`.channelId

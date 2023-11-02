@@ -13,7 +13,8 @@ import java.lang.reflect.Type
 /** Utility class to store and retrieve preferences  */
 @Suppress("unused")
 public class SettingsUtilsJSON(plugin: String) {
-    private val settingsFile = File("$SETTINGS_PATH/$plugin.json")
+    private val settingsDir = File(SETTINGS_PATH)
+    private val settingsFile = settingsDir.resolve("$plugin.json")
     private val cache: MutableMap<String, Any?> = hashMapOf()
     private val settings: JSONObject by lazy {
         if (settingsFile.exists()) {
@@ -24,8 +25,9 @@ public class SettingsUtilsJSON(plugin: String) {
     }
 
     init {
-        val dir = File(SETTINGS_PATH)
-        if (!dir.exists() && !dir.mkdir()) throw RuntimeException("Failed to create settings dir")
+        if (!settingsDir.exists() && !settingsDir.mkdir()) {
+            throw RuntimeException("Failed to create settings dir")
+        }
     }
 
     private fun writeData() {

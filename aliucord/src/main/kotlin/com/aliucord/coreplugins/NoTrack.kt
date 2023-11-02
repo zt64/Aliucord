@@ -13,7 +13,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.robv.android.xposed.XposedBridge
 
 internal class NoTrack : Plugin(Manifest("NoTrack")) {
-    @Throws(Throwable::class)
     override fun load(context: Context) {
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false)
 

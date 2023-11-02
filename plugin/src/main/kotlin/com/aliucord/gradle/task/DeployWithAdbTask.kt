@@ -28,7 +28,6 @@ abstract class DeployWithAdbTask : DefaultTask() {
     @set:Option(option = "wait-for-debugger", description = "Enables debugging flag when starting the discord activity")
     var waitForDebugger: Boolean = false
 
-
     @TaskAction
     fun deployWithAdb() {
         val android: BaseExtension = project.extensions.getByName<BaseExtension>("android")

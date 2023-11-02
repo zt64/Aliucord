@@ -55,11 +55,11 @@ public abstract class Plugin @JvmOverloads constructor(manifest: Manifest? = nul
     @JvmField
     public val settings: SettingsAPI
 
-    protected val annotation: AliucordPlugin?
+    protected val annotation: com.aliucord.annotations.AliucordPlugin?
         /**
          * Returns the @AliucordPlugin annotation if exists
          */
-        get() = javaClass.getAnnotation(AliucordPlugin::class.java)
+        get() = javaClass.getAnnotation(com.aliucord.annotations.AliucordPlugin::class.java)
 
 
     init {

@@ -15,7 +15,7 @@ import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemBotCompone
 
 internal class ButtonsAPI : Plugin(Manifest("ButtonsAPI")) {
     override fun load(context: Context) {
-        patcher.before<WidgetChatListAdapterItemBotComponentRow>(
+        GlobalPatcher.before<WidgetChatListAdapterItemBotComponentRow>(
             "onButtonComponentClick",
             Int::class.java,
             String::class.java

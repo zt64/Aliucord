@@ -8,6 +8,7 @@
 
 package com.aliucord
 
+import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.res.Resources
@@ -189,7 +190,6 @@ public object Utils {
 
         // TODO: Do we need to add query permission to AndroidManifest? I tried on Android 11 and it resolved MiXplorer correctly
         @Suppress("QueryPermissionsNeeded")
-
         if (intent.resolveActivityInfo(appActivity.packageManager, 0) == null) {
             ConfirmDialog()
                 .setTitle(":(")
@@ -255,6 +255,7 @@ public object Utils {
      * @param type Type of the resource.
      * @return ID of the resource, or 0 if not found.
      */
+    @Suppress("DiscouragedApi")
     @JvmStatic
     public fun getResId(name: String, type: String): Int = resIdCache.getOrPut(name) {
         appContext.resources.getIdentifier(
@@ -288,10 +289,7 @@ public object Utils {
      * @return CommandChoice
      */
     @JvmStatic
-    public fun createCommandChoice(name: String, value: String): CommandChoice {
-        return CommandChoice(name, value)
-    }
-
+    public fun createCommandChoice(name: String, value: String): CommandChoice = CommandChoice(name, value)
 
     // kept for compatibility
     /**
@@ -387,8 +385,8 @@ public object Utils {
      * @return Built Clyde
      */
     @JvmStatic
-    public fun buildClyde(name: String?, avatarUrl: String?): User =
-        User(
+    public fun buildClyde(name: String?, avatarUrl: String?): User {
+        return User(
             -1,
             name ?: "Clyde",
             NullSerializable.b(avatarUrl ?: Constants.Icons.CLYDE),
@@ -413,6 +411,7 @@ public object Utils {
             null,
             0
         )
+    }
 
     /**
      * Creates a checkable [View].
@@ -499,7 +498,7 @@ public object Utils {
      * @param msg Message
      * @param position position, see [Gravity]
      */
-    @Suppress("ShowToast", "InternalInsetResource")
+    @Suppress("ShowToast", "InternalInsetResource", "DiscouragedApi")
     @JvmStatic
     @JvmOverloads
     public fun promptRestart(

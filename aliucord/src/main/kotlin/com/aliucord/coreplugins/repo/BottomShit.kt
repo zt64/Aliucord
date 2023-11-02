@@ -20,16 +20,16 @@ internal class BottomShit : BottomSheet() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
-        val context: Context = requireContext()
+        val ctx: Context = requireContext()
         setPadding(20)
-        val title = TextView(context, null, 0, R.i.UiKit_Settings_Item_Header).apply {
+        val title = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
             text = "PluginRepo"
-            typeface = ResourcesCompat.getFont(context, WHITNEY_SEMIBOLD)
+            typeface = ResourcesCompat.getFont(ctx, WHITNEY_SEMIBOLD)
             setGravity(Gravity.START)
         }
 
         val notifyNewPlugins: CheckedSetting = Utils.createCheckedSetting(
-            context,
+            ctx,
             CheckedSetting.ViewType.CHECK,
             "Notify new plugins",
             ""

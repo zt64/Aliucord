@@ -112,7 +112,7 @@ public open class SettingsPage : AppFragment(resId) {
      * @param drawable The drawable this button should have
      * @param onClick  The onClick listener of this button
      * @return The id of this header button
-     * @see Toolbar.getMenu
+     * @see [Toolbar.getMenu]
      * @see Menu.add
      */
     public fun addHeaderButton(
@@ -181,7 +181,8 @@ public open class SettingsPage : AppFragment(resId) {
      *
      * @param context Context
      */
-    protected fun addDivider(context: Context): Unit = addView(Divider(requireContext()))
+    @JvmOverloads
+    protected fun addDivider(context: Context = requireContext()): Unit = addView(Divider(context))
 
     /**
      * Add a header
@@ -194,9 +195,7 @@ public open class SettingsPage : AppFragment(resId) {
         addView(header)
     }
 
-    protected fun addHeader(text: String?) {
-        addHeader(requireContext(), text)
-    }
+    protected fun addHeader(text: String?): Unit = addHeader(requireContext(), text)
 
     /** Adds a view to the LinearLayout associated with this Page  */
     protected fun addView(view: View?): Unit = linearLayout.addView(view)

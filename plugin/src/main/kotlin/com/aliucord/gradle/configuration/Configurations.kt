@@ -17,25 +17,25 @@ package com.aliucord.gradle.configuration
 
 import org.gradle.api.Project
 
-fun registerConfigurations(project: Project) {
+fun Project.registerConfigurations() {
     val providers = listOf(DiscordConfigurationProvider())
 
     providers.forEach { provider ->
-        project.configurations.register(provider.name) {
+        configurations.register(provider.name) {
             isTransitive = false
         }
     }
 
-    project.afterEvaluate {
+    afterEvaluate {
         providers.forEach { provider ->
-            val configuration = project.configurations.getByName(provider.name)
+            val configuration = this@registerConfigurations.configurations.getByName(provider.name)
             val dependencies = configuration.dependencies
 
             require(dependencies.size <= 1) {
                 "Only one '${provider.name}' dependency should be specified, but ${dependencies.size} were!"
             }
 
-            dependencies.forEach { provider.provide(project, it) }
+            dependencies.forEach { provider.provide(this@registerConfigurations, it) }
         }
     }
 }

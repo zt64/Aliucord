@@ -44,25 +44,22 @@ import java.io.File
 internal class InstalledPluginsPage : SettingsPage() {
     private class Adapter(
         private val fragment: AppFragment,
-        plugins: Collection<Plugin>?
+        plugins: Collection<Plugin>
     ) : RecyclerView.Adapter<Adapter.ViewHolder>(), Filterable {
-        private class ViewHolder(private val adapter: Adapter, val card: PluginCard) :
-            RecyclerView.ViewHolder(card) {
+        private class ViewHolder(private val adapter: Adapter, val card: PluginCard) : RecyclerView.ViewHolder(card) {
             init {
-                card.repoButton.setOnClickListener { adapter.onGithubClick(adapterPosition) }
-                card.changeLogButton.setOnClickListener { adapter.onChangeLogClick(adapterPosition) }
-                card.uninstallButton.setOnClickListener { adapter.onUninstallClick(adapterPosition) }
-                card.switchHeader.setOnCheckedListener(::onToggleClick)
-                card.settingsButton.setOnClickListener { adapter.onSettingsClick(adapterPosition) }
-            }
-
-            fun onToggleClick(checked: Boolean) {
-                adapter.onToggleClick(this, checked, getAdapterPosition())
+                card.apply {
+                    repoButton.setOnClickListener { adapter.onGithubClick(adapterPosition) }
+                    changeLogButton.setOnClickListener { adapter.onChangeLogClick(adapterPosition) }
+                    uninstallButton.setOnClickListener { adapter.onUninstallClick(adapterPosition) }
+                    switchHeader.setOnCheckedListener { adapter.onToggleClick(this@ViewHolder, it, adapterPosition) }
+                    settingsButton.setOnClickListener { adapter.onSettingsClick(adapterPosition) }
+                }
             }
         }
 
         private val ctx = fragment.requireContext()
-        private val originalData = plugins!!.sortedBy { it.name }.toMutableList()
+        private val originalData = plugins.sortedBy { it.name }.toMutableList()
         private var data = originalData
 
         override fun getItemCount() = data.size
@@ -142,10 +139,7 @@ internal class InstalledPluginsPage : SettingsPage() {
                         newItemPosition: Int
                     ): Boolean = data[oldItemPosition].name == res[newItemPosition].name
 
-                    override fun areContentsTheSame(
-                        oldItemPosition: Int,
-                        newItemPosition: Int
-                    ): Boolean = true
+                    override fun areContentsTheSame(a: Int, b: Int) = true
                 }, false)
                 data = res.toMutableList()
                 diff.dispatchUpdatesTo(this@Adapter)
@@ -196,7 +190,7 @@ internal class InstalledPluginsPage : SettingsPage() {
         fun onToggleClick(holder: ViewHolder, state: Boolean, position: Int) {
             val p = data[position]
             togglePlugin(p.name)
-            holder.card.settingsButton.setEnabled(state)
+            holder.card.settingsButton.isEnabled = state
             if (p.requiresRestart()) promptRestart()
         }
 
@@ -236,7 +230,6 @@ internal class InstalledPluginsPage : SettingsPage() {
         removeScrollView()
 
         val context = view.context
-        val padding = defaultPadding
         addHeaderButton("Open Plugins Folder", R.e.ic_open_in_new_white_24dp) {
             val dir = File(Constants.PLUGINS_PATH)
             if (!dir.exists() && !dir.mkdir()) {
@@ -257,19 +250,20 @@ internal class InstalledPluginsPage : SettingsPage() {
         }
         val input = TextInput(context)
         input.setHint(context.getString(R.h.search))
-        val recyclerView = RecyclerView(context)
-        recyclerView.setLayoutManager(LinearLayoutManager(context, RecyclerView.VERTICAL, false))
         val adapter = Adapter(this, PluginManager.plugins.values)
-        recyclerView.setAdapter(adapter)
+        val recyclerView = RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+            this.adapter = adapter
+        }
         val shape = ShapeDrawable(RectShape()).apply {
             setTint(Color.TRANSPARENT)
-            setIntrinsicHeight(padding)
+            intrinsicHeight = defaultPadding
         }
 
         val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         decoration.setDrawable(shape)
         recyclerView.addItemDecoration(decoration)
-        recyclerView.setPadding(0, padding, 0, 0)
+        recyclerView.setPadding(0, defaultPadding, 0, 0)
         addView(input)
         addView(recyclerView)
 

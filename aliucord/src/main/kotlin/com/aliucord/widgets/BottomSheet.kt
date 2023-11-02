@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.widget.NestedScrollView
+import com.aliucord.Utils.nestedChildAt
 import com.discord.app.AppBottomSheet
 import com.discord.widgets.channels.WidgetChannelSelector
 
@@ -25,7 +26,7 @@ public open class BottomSheet : AppBottomSheet() {
         get() {
             if (layout == null) {
                 checkNotNull(view) { "This BottomSheet has not been initialised yet. Did you forget to call super.onViewCreated?" }
-                layout = (requireView() as NestedScrollView).getChildAt(0) as LinearLayout
+                layout = (requireView() as NestedScrollView).nestedChildAt<LinearLayout>(0)
             }
             return layout
         }

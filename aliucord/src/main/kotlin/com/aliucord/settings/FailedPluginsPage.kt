@@ -24,9 +24,11 @@ internal class FailedPluginsPage : SettingsPage() {
 
         setActionBarTitle("Plugin Errors")
 
+        val themedColor = ColorCompat.getThemedColor(view.context, R.b.colorBackgroundSecondary)
+
         PluginManager.failedToLoad.forEach { (file, reason) ->
             linearLayout.addView(MaterialCardView(view.context).apply {
-                setCardBackgroundColor(ColorCompat.getThemedColor(view.context, R.b.colorBackgroundSecondary))
+                setCardBackgroundColor(themedColor)
                 layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
                     setMargins(0, 8.dp, 0, 8.dp)
                 }

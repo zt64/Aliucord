@@ -37,9 +37,9 @@ class DiscordConfigurationProvider : IConfigurationProvider {
             "aliucord-SNAPSHOT" -> {
                 if (aliucordSnapshot == null) {
                     project.logger.lifecycle("Fetching discord version")
-                    val data =
-                        JsonSlurper().parse(URL("https://raw.githubusercontent.com/zt64/Zeetcord/builds/data.json")) as Map<*, *>
-                    aliucordSnapshot = parseInt(data["versionCode"] as String)
+                    val data = JsonSlurper()
+                        .parse(URL("https://raw.githubusercontent.com/zt64/Zeetcord/builds/data.json")) as Map<*, *>
+                    aliucordSnapshot = (data["versionCode"] as String).toInt()
                     project.logger.lifecycle("Fetched discord version: $aliucordSnapshot")
                 }
 

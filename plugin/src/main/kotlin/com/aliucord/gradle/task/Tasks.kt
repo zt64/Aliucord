@@ -29,33 +29,33 @@ import org.gradle.kotlin.dsl.*
 
 internal const val TASK_GROUP = "aliucord"
 
-fun registerTasks(project: Project) {
-    val extension = project.extensions.getAliucord()
-    val intermediates = project.layout.buildDirectory.dir("intermediates").get()
+fun Project.registerTasks() {
+    val extension = extensions.getAliucord()
+    val intermediates = layout.buildDirectory.dir("intermediates").get()
 
-    if (project.rootProject.tasks.findByName("generateUpdaterJson") == null) {
-        project.rootProject.tasks.register<GenerateUpdaterJsonTask>("generateUpdaterJson") {
+    if (rootProject.tasks.findByName("generateUpdaterJson") == null) {
+        rootProject.tasks.register<GenerateUpdaterJsonTask>("generateUpdaterJson") {
             group = TASK_GROUP
 
             outputs.upToDateWhen { false }
 
-            outputFile = project.layout.buildDirectory.file("updater.json")
+            outputFile = layout.buildDirectory.file("updater.json")
         }
     }
 
-    project.tasks.register<GenSourcesTask>("genSources") {
+    tasks.register<GenSourcesTask>("genSources") {
         group = TASK_GROUP
     }
 
     val pluginClassFile = intermediates.file("pluginClass").asFile
 
-    val compileDex by project.tasks.registering(CompileDexTask::class) {
+    val compileDex by tasks.registering(CompileDexTask::class) {
         group = TASK_GROUP
 
         this.pluginClassFile = pluginClassFile
 
         for (name in arrayOf("compileDebugJavaWithJavac", "compileDebugKotlin")) {
-            val task = project.tasks.named(name).orNull
+            val task = tasks.named(name).orNull
             if (task != null) {
                 dependsOn(task)
                 input.from(task.outputs)
@@ -65,10 +65,10 @@ fun registerTasks(project: Project) {
         outputFile = intermediates.file("classes.dex")
     }
 
-    val compileResources by project.tasks.registering(CompileResourcesTask::class) {
+    val compileResources by tasks.registering(CompileResourcesTask::class) {
         group = TASK_GROUP
 
-        val processDebugManifest by project.tasks.getting(ProcessLibraryManifest::class)
+        val processDebugManifest by tasks.getting(ProcessLibraryManifest::class)
         dependsOn(processDebugManifest)
 
         val android = project.extensions.getByName<BaseExtension>("android")
@@ -81,8 +81,8 @@ fun registerTasks(project: Project) {
             val resApkFile = outputFile.asFile.get()
 
             if (resApkFile.exists()) {
-                project.tasks.named<AbstractCopyTask>("make") {
-                    from(project.zipTree(resApkFile)) {
+                tasks.named<AbstractCopyTask>("make") {
+                    from(zipTree(resApkFile)) {
                         exclude("AndroidManifest.xml")
                     }
                 }
@@ -90,8 +90,8 @@ fun registerTasks(project: Project) {
         }
     }
 
-    project.afterEvaluate {
-        project.tasks.register(
+    afterEvaluate {
+        tasks.register(
             name = "make",
             type = if (extension.projectType.get() == ProjectType.INJECTOR) {
                 Copy::class
@@ -109,14 +109,12 @@ fun registerTasks(project: Project) {
 
                 from(manifestFile)
                 doFirst {
-                    require(project.version != "unspecified") {
+                    require(version != "unspecified") {
                         "No version is set"
                     }
 
-                    if (extension.pluginClassName == null) {
-                        if (pluginClassFile.exists()) {
-                            extension.pluginClassName = pluginClassFile.readText()
-                        }
+                    if (extension.pluginClassName == null && pluginClassFile.exists()) {
+                        extension.pluginClassName = pluginClassFile.readText()
                     }
 
                     require(extension.pluginClassName != null) {
@@ -126,9 +124,9 @@ fun registerTasks(project: Project) {
                     manifestFile.writeText(
                         PluginManifest(
                             pluginClassName = extension.pluginClassName!!,
-                            name = project.name,
-                            version = project.version.toString(),
-                            description = project.description,
+                            name = name,
+                            version = version.toString(),
+                            description = description,
                             authors = extension.authors.get(),
                             links = extension.links,
                             updateUrl = extension.updateUrl.orNull,
@@ -142,11 +140,11 @@ fun registerTasks(project: Project) {
             from(compileDexTask.outputFile)
 
             if (extension.projectType.get() == ProjectType.INJECTOR) {
-                into(project.layout.buildDirectory)
+                into(layout.buildDirectory)
                 rename { return@rename "injector.dex" }
 
                 doLast {
-                    logger.lifecycle("Copied injector.dex to ${project.layout.buildDirectory}")
+                    logger.lifecycle("Copied injector.dex to ${layout.buildDirectory}")
                 }
             } else {
                 this as Zip
@@ -155,7 +153,7 @@ fun registerTasks(project: Project) {
                 isPreserveFileTimestamps = false
                 archiveBaseName = "zeetcord"
                 archiveVersion = ""
-                destinationDirectory.set(project.layout.buildDirectory)
+                destinationDirectory.set(layout.buildDirectory)
 
                 doLast {
                     logger.lifecycle("Made Zeetcord package at ${outputs.files.singleFile}")
@@ -163,7 +161,7 @@ fun registerTasks(project: Project) {
             }
         }
 
-        project.tasks.register<DeployWithAdbTask>("deployWithAdb") {
+        tasks.register<DeployWithAdbTask>("deployWithAdb") {
             group = TASK_GROUP
             dependsOn("make")
         }

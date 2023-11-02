@@ -49,12 +49,10 @@ public object Updater {
     }
 
     private var isAliucordOutdated: Boolean? = null
-    private var isDiscordOutdated: Boolean? = null
     private fun fetchAliucordData(): Boolean = try {
-        Http.Request("https://raw.githubusercontent.com/Aliucord/Aliucord/builds/data.json").use { req ->
+        Http.Request("https://raw.githubusercontent.com/zt64/Zeetcord/builds/data.json").use { req ->
             val res = req.execute().json(AliucordData::class.java)
             isAliucordOutdated = BuildConfig.GIT_REVISION != res.aliucordHash
-            isDiscordOutdated = Constants.DISCORD_VERSION < res.versionCode
             true
         }
     } catch (ex: IOException) {
@@ -72,17 +70,6 @@ public object Updater {
         usingDexFromStorage() || isUpdaterDisabled -> false
         isAliucordOutdated == null && !fetchAliucordData() -> false
         else -> isAliucordOutdated!!
-    }
-
-    /**
-     * Determines whether the Base Discord is outdated
-     *
-     * @return Whether Aliucord's currently supported Discord version is newer than the installed one
-     */
-    @JvmStatic
-    public fun isDiscordOutdated(): Boolean = when {
-        isUpdaterDisabled || (isDiscordOutdated == null && !fetchAliucordData()) -> false
-        else -> isDiscordOutdated!!
     }
 
     /**

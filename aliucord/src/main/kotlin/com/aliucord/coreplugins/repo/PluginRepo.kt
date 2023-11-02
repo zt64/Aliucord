@@ -12,7 +12,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.postDelayed
 import com.aliucord.Constants.Fonts.WHITNEY_MEDIUM
 import com.aliucord.Utils
-import com.aliucord.Utils.appActivity
 import com.aliucord.Utils.getResId
 import com.aliucord.Utils.nestedChildAt
 import com.aliucord.Utils.openPage
@@ -22,18 +21,17 @@ import com.aliucord.api.NotificationsAPI.display
 import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.NotificationData
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.Hook
+import com.aliucord.patcher.after
 import com.aliucord.settings.UpdaterPage
 import com.discord.models.domain.ModelUserSettings
 import com.discord.stores.StoreStream
 import com.discord.utilities.color.ColorCompat
-import com.discord.widgets.settings.WidgetSettings
-import com.discord.widgets.settings.WidgetSettingsAppearance
-import com.discord.widgets.settings.`WidgetSettingsAppearance$updateTheme$1`
+import com.discord.widgets.settings.*
 import com.lytefast.flexinput.R
 import java.util.Calendar
 
 internal class PluginRepo : Plugin(Manifest("PluginRepo2")) {
+    @Suppress("SetTextI18n")
     override fun start(context: Context) {
         settingsAPI = settings
         settingsTab = SettingsTab(BottomShit::class.java, SettingsTab.Type.BOTTOM_SHEET)
@@ -86,41 +84,40 @@ internal class PluginRepo : Plugin(Manifest("PluginRepo2")) {
                 showToast("Have a blind day! **PluginRepo**")
             }
         }
-        patcher.patch(
-            WidgetSettings::class.java.getDeclaredMethod("onViewBound", View::class.java), Hook { cf ->
-                val ctx = (cf.thisObject as WidgetSettings).requireContext()
-                val view = cf.args[0] as CoordinatorLayout
-                val v = view.nestedChildAt<LinearLayoutCompat>(1, 0)
-                val font = ResourcesCompat.getFont(ctx, WHITNEY_MEDIUM)
-                // Stole this from Main.java
-                val baseIndex = v.indexOfChild(
-                    v.findViewById(getResId("developer_options_divider", "id"))
-                )
-                val openPluginRepo = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
-                    text = "Open Plugin Repo"
-                    typeface = font
-                }
-                val iconColor = ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal)
-                val icon = ContextCompat.getDrawable(ctx, R.e.ic_upload_24dp)
-                if (icon != null) {
-                    val copy = icon.mutate()
-                    copy.setTint(iconColor)
-                    openPluginRepo.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                        copy,
-                        null,
-                        null,
-                        null
-                    )
-                }
-                openPluginRepo.setOnClickListener { e ->
-                    openPage(e.context, UpdaterPage::class.java)
-                }
-                v.addView(openPluginRepo, baseIndex)
-                openPluginRepo.setOnClickListener {
-                    openPageWithProxy(appActivity, PluginsPage())
-                }
+
+        val dividerId = getResId("developer_options_divider", "id")
+
+        patcher.after<WidgetSettings>("onViewBound", View::class.java) { cf ->
+            val ctx = requireContext()
+            val view = cf.args[0] as CoordinatorLayout
+            val v = view.nestedChildAt<LinearLayoutCompat>(1, 0)
+            val font = ResourcesCompat.getFont(ctx, WHITNEY_MEDIUM)
+            // Stole this from Main.java
+            val baseIndex = v.indexOfChild(v.findViewById(dividerId))
+            val openPluginRepo = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).apply {
+                text = "Open Plugin Repo"
+                typeface = font
             }
-        )
+            val iconColor = ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal)
+            val icon = ContextCompat.getDrawable(ctx, R.e.ic_upload_24dp)
+            if (icon != null) {
+                val copy = icon.mutate()
+                copy.setTint(iconColor)
+                openPluginRepo.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    copy,
+                    null,
+                    null,
+                    null
+                )
+            }
+            openPluginRepo.setOnClickListener { e ->
+                openPage(e.context, UpdaterPage::class.java)
+            }
+            v.addView(openPluginRepo, baseIndex)
+            openPluginRepo.setOnClickListener {
+                openPageWithProxy(appActivity, PluginsPage())
+            }
+        }
     }
 
     override fun stop(context: Context) {

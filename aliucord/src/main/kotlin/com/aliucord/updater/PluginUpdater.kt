@@ -66,10 +66,6 @@ internal object PluginUpdater {
         when {
             !Updater.usingDexFromStorage() -> {
                 when {
-                    Updater.isDiscordOutdated() -> {
-                        body = "Your Base Discord is outdated. Please update using the installer - $body"
-                    }
-
                     Updater.isAliucordOutdated() -> {
                         body = if (Main.settings.getBool(AUTO_UPDATE_ALIUCORD_KEY, false)) {
                             try {
@@ -99,7 +95,7 @@ internal object PluginUpdater {
             val updateInfo = getUpdateInfo(plugin)
 
             if (updateInfo == null || updateInfo.minimumDiscordVersion > Constants.DISCORD_VERSION) return false
-            val updatedVer = updated[plugin.javaClass.getSimpleName()]
+            val updatedVer = updated[plugin.javaClass.simpleName]
 
             return if (updatedVer != null && !Updater.isOutdated(
                     plugin.name,
@@ -110,7 +106,7 @@ internal object PluginUpdater {
                 Updater.isOutdated(plugin.name, plugin.manifest.version, updateInfo.version!!)
             }
         } catch (e: Throwable) {
-            logger.error("Failed to check update for: ${plugin.javaClass.getSimpleName()}", e)
+            logger.error("Failed to check update for: ${plugin.javaClass.simpleName}", e)
         }
 
         return false

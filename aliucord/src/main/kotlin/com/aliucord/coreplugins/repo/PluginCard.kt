@@ -11,13 +11,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.aliucord.Constants.Fonts.WHITNEY_SEMIBOLD
 import com.aliucord.utils.DimenUtils.defaultCardRadius
-import com.aliucord.utils.DimenUtils.defaultPadding
 import com.aliucord.utils.DimenUtils.dpToPx
 import com.aliucord.views.*
 import com.aliucord.widgets.LinearLayout
 import com.discord.utilities.color.ColorCompat
 import com.google.android.material.card.MaterialCardView
 import com.lytefast.flexinput.R
+import com.aliucord.utils.DimenUtils.defaultPadding as p
 
 @Suppress("SetTextI18n")
 internal class PluginCard(ctx: Context) : MaterialCardView(ctx) {
@@ -32,11 +32,10 @@ internal class PluginCard(ctx: Context) : MaterialCardView(ctx) {
 
     // com.aliucord.widgets.PluginCard
     init {
-        setRadius(defaultCardRadius.toFloat())
+        radius = defaultCardRadius.toFloat()
         setCardBackgroundColor(ColorCompat.getThemedColor(ctx, R.b.colorBackgroundSecondary))
-        setLayoutParams(LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 
-        val p = defaultPadding
         val p2 = p / 2
 
         root = LinearLayout(ctx)

@@ -26,8 +26,8 @@ import com.discord.widgets.channels.list.WidgetChannelsList
 import com.discord.widgets.user.Badge
 import com.discord.widgets.user.profile.UserProfileHeaderView
 import com.discord.widgets.user.profile.UserProfileHeaderViewModel.ViewState
-import com.lytefast.flexinput.R
 import java.util.concurrent.atomic.AtomicBoolean
+import com.lytefast.flexinput.R
 
 private const val URL = "https://raw.githubusercontent.com/Aliucord/badges/main"
 
@@ -99,7 +99,7 @@ internal class Badges : Plugin(Manifest("Badges")) {
             }
         }
 
-        patcher.after<WidgetChannelsList>("onViewBound", View::class.java) {
+        GlobalPatcher.after<WidgetChannelsList>("onViewBound", View::class.java) {
             val binding = WidgetChannelsList.`access$getBinding$p`(this)
             val toolbar = binding.g.parent as ViewGroup
             if (toolbar.getChildAt(0).id != guildBadgeViewId) toolbar.addView(ImageView(toolbar.context).apply {
@@ -108,7 +108,7 @@ internal class Badges : Plugin(Manifest("Badges")) {
             }, 0)
         }
 
-        patcher.after<WidgetChannelsList>(
+        GlobalPatcher.after<WidgetChannelsList>(
             "configureHeaderIcons",
             Guild::class.java,
             Boolean::class.javaPrimitiveType!!

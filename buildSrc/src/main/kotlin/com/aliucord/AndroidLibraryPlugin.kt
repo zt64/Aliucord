@@ -7,7 +7,6 @@ import org.gradle.kotlin.dsl.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 class AndroidLibraryPlugin : Plugin<Project> {
-    @Suppress("UnstableApiUsage")
     override fun apply(target: Project) {
         with(target) {
             apply {
@@ -46,7 +45,7 @@ class AndroidLibraryPlugin : Plugin<Project> {
 
             dependencies {
                 val discord by configurations
-                val implementation by configurations
+                // val implementation by configurations
                 discord(libs.discord)
             }
 

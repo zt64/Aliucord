@@ -42,7 +42,7 @@ public class TextInput @JvmOverloads constructor(
     init {
         val root = LinearLayout(context)
         LayoutInflater.from(context).inflate(getResId("widget_change_guild_identity", "layout"), root)
-        layout = root.findViewById(getResId("set_nickname_text", "id")) as TextInputLayout
+        layout = root.findViewById(getResId("set_nickname_text", "id"))!!
         (layout.parent as CardView).removeView(layout)
         addView(layout)
         setCardBackgroundColor(Color.TRANSPARENT)
@@ -114,7 +114,7 @@ public class TextInput @JvmOverloads constructor(
      * @return self
      */
     public fun setThemedEndIcon(icon: Drawable): TextInput = apply {
-        getRoot().setEndIconDrawable(tintToTheme(icon.mutate()))
+        getRoot().endIconDrawable = tintToTheme(icon.mutate())
     }
 
     /**
@@ -123,6 +123,6 @@ public class TextInput @JvmOverloads constructor(
      * @return self
      */
     public fun setThemedEndIcon(@DrawableRes icon: Int): TextInput = apply {
-        getRoot().setEndIconDrawable(tintToTheme(ContextCompat.getDrawable(getRoot().context, icon)))
+        getRoot().endIconDrawable = tintToTheme(ContextCompat.getDrawable(getRoot().context, icon))
     }
 }

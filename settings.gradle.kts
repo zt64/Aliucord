@@ -11,6 +11,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         mavenCentral()
         google()
@@ -24,4 +25,3 @@ rootProject.name = "Aliucord"
 include(":aliucord")
 include(":injector")
 include(":plugin")
-// include(":core")

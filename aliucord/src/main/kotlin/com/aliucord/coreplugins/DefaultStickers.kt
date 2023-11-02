@@ -92,7 +92,7 @@ internal class DefaultStickers : Plugin(Manifest("DefaultStickers")) {
             if (sticker.k() == StickerType.STANDARD) it.result = StickerSendability.SENDABLE
         }
 
-        patcher.before<`MessageQueue$doSend$2`<*, *>>(
+        GlobalPatcher.before<`MessageQueue$doSend$2`<*, *>>(
             "call",
             SendUtils.SendPayload.ReadyToSend::class.java
         ) { (it, payload: SendUtils.SendPayload.ReadyToSend) ->

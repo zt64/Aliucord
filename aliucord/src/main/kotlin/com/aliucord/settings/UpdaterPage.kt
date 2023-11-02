@@ -24,7 +24,6 @@ import com.aliucord.updater.PluginUpdater
 import com.aliucord.updater.Updater
 import com.aliucord.utils.DimenUtils.defaultPadding
 import com.aliucord.widgets.UpdaterPluginCard
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.lytefast.flexinput.R
 
@@ -45,23 +44,9 @@ internal class UpdaterPage : SettingsPage() {
                 Updater.usingDexFromStorage() -> {
                     Snackbar.make(
                         linearLayout,
-                        "Updater disabled due to using Aliucord from storage.",
+                        "Updater disabled due to using Zeetcord from storage.",
                         Snackbar.LENGTH_INDEFINITE
                     )
-                }
-                Updater.isDiscordOutdated() -> {
-                    Snackbar
-                        .make(
-                            linearLayout,
-                            "Your Base Discord is outdated. Please update using the installer.",
-                            BaseTransientBottomBar.LENGTH_INDEFINITE
-                        )
-                        .setAction("Open Installer") { v ->
-                            val ctx = v.context
-                            val i =
-                                ctx.packageManager.getLaunchIntentForPackage("com.aliucord.installer")
-                            if (i != null) ctx.startActivity(i) else showToast("Please install the Aliucord installer and try again.")
-                        }
                 }
                 Updater.isAliucordOutdated() -> {
                     Snackbar
@@ -75,7 +60,7 @@ internal class UpdaterPage : SettingsPage() {
                                 val ctx = v.context
                                 try {
                                     Updater.updateAliucord(ctx)
-                                    showToast("Successfully updated Aliucord.")
+                                    showToast("Successfully updated Zeetcord.")
                                     Snackbar
                                         .make(
                                             linearLayout,
@@ -95,7 +80,7 @@ internal class UpdaterPage : SettingsPage() {
                                         }
                                 } catch (th: Throwable) {
                                     PluginUpdater.logger.errorToast(
-                                        "Failed to update Aliucord. Check the debug log for more info",
+                                        "Failed to update Zeetcord. Check the debug log for more info",
                                         th
                                     )
                                 }
@@ -155,7 +140,7 @@ internal class UpdaterPage : SettingsPage() {
             return addView(state)
         }
 
-        stateText = "Found ${pluralise(PluginUpdater.updates.size, "update")}"
+        stateText = "Found ${pluralize(PluginUpdater.updates.size, "update")}"
         setActionBarSubtitle(stateText)
 
         PluginUpdater.updates.forEach { plugin ->

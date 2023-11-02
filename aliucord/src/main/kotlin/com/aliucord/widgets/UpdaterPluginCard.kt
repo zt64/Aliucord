@@ -26,17 +26,15 @@ import com.lytefast.flexinput.R
 @Suppress("SetTextI18n", "ViewConstructor")
 internal class UpdaterPluginCard(context: Context, plugin: String, forceUpdate: Runnable) : MaterialCardView(context) {
     init {
-        val padding = defaultPadding
-        val paddingHalf = padding / 2
-        val params = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        val paddingHalf = defaultPadding / 2
 
-        params.setMargins(0, paddingHalf, 0, 0)
-
-        setLayoutParams(params)
-        setUseCompatPadding(true)
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+            setMargins(0, paddingHalf, 0, 0)
+        }
+        useCompatPadding = true
         setCardBackgroundColor(ColorCompat.getThemedColor(context, R.b.colorBackgroundSecondary))
-        setRadius(defaultCardRadius.toFloat())
-        setContentPadding(padding, padding, padding, padding)
+        radius = defaultCardRadius.toFloat()
+        defaultPadding.let { setPadding(it, it, it, it) }
 
         val p = PluginManager.plugins[plugin]!!
         val layout = ConstraintLayout(context)

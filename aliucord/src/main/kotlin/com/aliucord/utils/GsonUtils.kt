@@ -7,7 +7,7 @@
 package com.aliucord.utils
 
 import com.discord.models.domain.Model
-import com.google.gson.Gson
+import com.google.gson.*
 import java.io.Reader
 import java.lang.reflect.Type
 import b.a.b.a as TypeAdapterRegistrar
@@ -41,6 +41,7 @@ public object GsonUtils {
      * @param clazz The class to deserialize the JSON into
      * @return Deserialized JSON
      */
+    @Throws(JsonSyntaxException::class)
     @JvmStatic
     public fun <T> Gson.fromJson(json: String?, clazz: Class<T>): T = g(json, clazz)
 
@@ -54,6 +55,7 @@ public object GsonUtils {
      * @param clazz The class to deserialize the JSON into
      * @return Deserialized JSON
      */
+    @Throws(JsonSyntaxException::class, JsonIOException::class)
     @JvmStatic
     public fun <T> Gson.fromJson(reader: Reader?, clazz: Class<T>): T = e(reader, clazz)
 
@@ -63,6 +65,7 @@ public object GsonUtils {
      * @param type The type of the object to deserialize the JSON into
      * @return Deserialized JSON
      */
+    @Throws(JsonSyntaxException::class)
     @JvmStatic
     public fun <T> Gson.fromJson(json: String?, type: Type?): T = g(json, type)
 

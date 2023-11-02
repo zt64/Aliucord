@@ -71,9 +71,9 @@ internal class PluginsAdapter(
         .replace("raw.githubusercontent.com", "github.com")
         .substringBefore("/builds")
 
-    fun onGithubClick(position: Int) = launchUrl(getGithubUrl(data[position]))
+    private fun onGithubClick(position: Int) = launchUrl(getGithubUrl(data[position]))
 
-    fun onChangeLogClick(position: Int) {
+    private fun onChangeLogClick(position: Int) {
         val p = data[position]
         val (_, _, _, _, version, _, changelog, changelogMedia) = p.manifest
 
@@ -89,7 +89,7 @@ internal class PluginsAdapter(
         )
     }
 
-    fun onInstallClick(position: Int) {
+    private fun onInstallClick(position: Int) {
         val p = data[position]
 
         Utils.threadPool.execute {
@@ -102,7 +102,7 @@ internal class PluginsAdapter(
         }
     }
 
-    fun onUninstallClick(position: Int) {
+    private fun onUninstallClick(position: Int) {
         val p = data[position]
         val dialog: ConfirmDialog = ConfirmDialog()
             .setIsDangerous(true)
@@ -129,10 +129,12 @@ internal class PluginsAdapter(
         val card: PluginCard
     ) : RecyclerView.ViewHolder(card) {
         init {
-            card.repoButton.setOnClickListener { adapter.onGithubClick(adapterPosition) }
-            card.changeLogButton.setOnClickListener { adapter.onChangeLogClick(adapterPosition) }
-            card.installButton.setOnClickListener { adapter.onInstallClick(adapterPosition) }
-            card.uninstallButton.setOnClickListener { adapter.onUninstallClick(adapterPosition) }
+            card.apply {
+                repoButton.setOnClickListener { adapter.onGithubClick(adapterPosition) }
+                changeLogButton.setOnClickListener { adapter.onChangeLogClick(adapterPosition) }
+                installButton.setOnClickListener { adapter.onInstallClick(adapterPosition) }
+                uninstallButton.setOnClickListener { adapter.onUninstallClick(adapterPosition) }
+            }
         }
     }
 }

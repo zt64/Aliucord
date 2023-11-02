@@ -354,7 +354,7 @@ public object Main {
             val res = dir.mkdirs()
 
             if (!res) {
-                return logger.error("Failed to create directories!", null)
+                return logger.error("Failed to create directories!")
             }
         }
 

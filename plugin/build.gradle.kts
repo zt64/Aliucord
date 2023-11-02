@@ -7,8 +7,8 @@ group = "com.aliucord"
 
 dependencies {
     compileOnly("com.google.guava:guava:30.1.1-jre")
-    compileOnly("com.android.tools:sdk-common:31.1.1")
-    compileOnly("com.android.tools.build:gradle:8.1.1")
+    compileOnly("com.android.tools:sdk-common:31.1.2")
+    compileOnly("com.android.tools.build:gradle:8.1.2")
 
     implementation(libs.dex.translator)
     implementation(libs.jadx.core)

@@ -13,6 +13,7 @@ import android.transition.TransitionManager
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.*
+import android.widget.Toolbar.LayoutParams.WRAP_CONTENT
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
@@ -24,6 +25,7 @@ import com.aliucord.Utils
 import com.aliucord.coreplugins.repo.filtering.FilterAdapter
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.utils.DimenUtils
+import com.aliucord.utils.DimenUtils.defaultPadding
 import com.aliucord.views.TextInput
 import com.aliucord.views.ToolbarButton
 import com.discord.utilities.color.ColorCompat
@@ -37,6 +39,8 @@ internal class PluginsPage : SettingsPage() {
     lateinit var searchBox: EditText
     var index = 0
     var requestMade = false
+
+    private val pluginsDir = File(Constants.PLUGINS_PATH)
 
     @Suppress("NotifyDataSetChanged")
     fun makeSearch(input: String?, index: Int) {
@@ -62,7 +66,7 @@ internal class PluginsPage : SettingsPage() {
     }
 
     fun makeSearch() {
-        makeSearch(searchBox.getText().toString())
+        makeSearch(searchBox.text.toString())
         searchBox.clearFocus()
     }
 
@@ -73,86 +77,93 @@ internal class PluginsPage : SettingsPage() {
         super.onViewBound(view)
         setActionBarTitle("Plugin Repo")
         val context = view.context
-        val padding = DimenUtils.defaultPadding
-        val p = padding / 2
-        PluginRepoAPI.filters = HashMap()
+        val p = defaultPadding / 2
+        PluginRepoAPI.filters = hashMapOf()
         setActionBarSubtitle("Loading...")
-        if (headerBar.findViewById<View?>(uniqueId) == null) {
-            val pluginFolderBtn = ToolbarButton(context)
-            pluginFolderBtn.setId(uniqueId)
-            val params = Toolbar.LayoutParams(
-                Toolbar.LayoutParams.WRAP_CONTENT,
-                Toolbar.LayoutParams.WRAP_CONTENT
-            )
-            params.gravity = Gravity.END
-            params.setMarginEnd(p)
-            pluginFolderBtn.setLayoutParams(params)
-            pluginFolderBtn.setPadding(p, p, p, p)
-            pluginFolderBtn.setImageDrawable(
+
+        if (headerBar.findViewById<View?>(uniqueId) != null) return
+
+        val pluginFolderBtn = ToolbarButton(context).apply {
+            id = uniqueId
+            layoutParams = Toolbar.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+                gravity = Gravity.END
+                marginEnd = p
+            }
+            setPadding(p, p, p, p)
+            setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.e.ic_open_in_new_white_24dp
                 )
             )
-            pluginFolderBtn.setOnClickListener {
-                val dir = File(Constants.PLUGINS_PATH)
-                if (!dir.exists() && !dir.mkdir()) {
+            setOnClickListener {
+                if (!pluginsDir.exists() && !pluginsDir.mkdir()) {
                     Utils.showToast("Failed to create plugins directory!", true)
                     return@setOnClickListener
                 }
-                Utils.launchFileExplorer(dir)
+                Utils.launchFileExplorer(pluginsDir)
             }
-            // addHeaderButton(pluginFolderBtn)
-            val input = TextInput(context)
-            input.setHint(context.getString(R.h.search))
-            val recyclerView = RecyclerView(context)
-            recyclerView.setLayoutManager(
-                LinearLayoutManager(
-                    context,
-                    RecyclerView.VERTICAL,
-                    false
-                )
-            )
-            adapter = PluginsAdapter(this, ArrayList())
-            recyclerView.setAdapter(adapter)
-            val shape = ShapeDrawable(RectShape())
-            shape.setTint(Color.TRANSPARENT)
-            shape.setIntrinsicHeight(padding)
-            val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-            decoration.setDrawable(shape)
-            recyclerView.addItemDecoration(decoration)
-            recyclerView.setPadding(0, padding, 0, 0)
-            loadingIcon = ProgressBar(context)
-            loadingIcon!!.isIndeterminate = true
-            loadingIcon!!.visibility = View.GONE
-            val filterView = RecyclerView(context)
-            filterView.setLayoutManager(LinearLayoutManager(context, RecyclerView.VERTICAL, false))
-            val filterAdapter = FilterAdapter(this)
-            filterView.setAdapter(filterAdapter)
-            filterView.addItemDecoration(decoration)
-            filterView.setPadding(0, padding, 0, 0)
-            filterView.visibility = View.GONE
+        }
+        // addHeaderButton(pluginFolderBtn)
+        val input = TextInput(context).apply {
+            setHint(context.getString(R.h.search))
+        }
+        adapter = PluginsAdapter(this, arrayListOf())
 
-            // https://github.com/Vendicated/AliucordPlugins/blob/main/DedicatedPluginSettings/src/main/java/dev/vendicated/aliucordplugs/dps/DedicatedPluginSettings.java#L63-L80
-            val openDrawable = ContextCompat.getDrawable(context, R.e.ic_arrow_down_14dp)!!.mutate()
-            openDrawable.setTint(ColorCompat.getThemedColor(context, R.b.colorInteractiveNormal))
-            val closedDrawable = object : LayerDrawable(arrayOf(openDrawable)) {
-                override fun draw(canvas: Canvas) {
-                    val bounds = openDrawable.getBounds()
-                    canvas.save()
-                    canvas.rotate(270f, bounds.width() / 2f, bounds.height() / 2f)
-                    super.draw(canvas)
-                    canvas.restore()
-                }
+        val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL).apply {
+            val shape = ShapeDrawable(RectShape()).apply {
+                setTint(Color.TRANSPARENT)
+                intrinsicHeight = defaultPadding
             }
-            val header = TextView(context, null, 0, R.i.UiKit_Settings_Item_Header)
-            header.text = "Filters"
-            header.setTypeface(ResourcesCompat.getFont(context, WHITNEY_SEMIBOLD))
-            header.setOnClickListener {
+
+            setDrawable(shape)
+        }
+        val recyclerView = RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(
+                context,
+                RecyclerView.VERTICAL,
+                false
+            )
+            this.adapter = adapter
+
+            addItemDecoration(decoration)
+            setPadding(0, defaultPadding, 0, 0)
+        }
+
+        loadingIcon = ProgressBar(context).apply {
+            isIndeterminate = true
+            visibility = View.GONE
+        }
+        val filterAdapter = FilterAdapter(this)
+
+        // https://github.com/Vendicated/AliucordPlugins/blob/main/DedicatedPluginSettings/src/main/java/dev/vendicated/aliucordplugs/dps/DedicatedPluginSettings.java#L63-L80
+        val openDrawable = ContextCompat.getDrawable(context, R.e.ic_arrow_down_14dp)!!.mutate().apply {
+            setTint(ColorCompat.getThemedColor(context, R.b.colorInteractiveNormal))
+        }
+        val closedDrawable = object : LayerDrawable(arrayOf(openDrawable)) {
+            override fun draw(canvas: Canvas) {
+                val bounds = openDrawable.getBounds()
+                canvas.save()
+                canvas.rotate(270f, bounds.width() / 2f, bounds.height() / 2f)
+                super.draw(canvas)
+                canvas.restore()
+            }
+        }
+        val filterView = RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+            adapter = filterAdapter
+            addItemDecoration(decoration)
+            setPadding(0, defaultPadding, 0, 0)
+            visibility = View.GONE
+        }
+        val header = TextView(context, null, 0, R.i.UiKit_Settings_Item_Header).apply {
+            text = "Filters"
+            typeface = ResourcesCompat.getFont(context, WHITNEY_SEMIBOLD)
+            setOnClickListener {
                 TransitionManager.beginDelayedTransition(linearLayout)
                 if (filterView.visibility == View.VISIBLE) {
                     filterView.visibility = View.GONE
-                    header.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    setCompoundDrawablesRelativeWithIntrinsicBounds(
                         closedDrawable,
                         null,
                         null,
@@ -160,7 +171,7 @@ internal class PluginsPage : SettingsPage() {
                     )
                 } else {
                     filterView.visibility = View.VISIBLE
-                    header.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    setCompoundDrawablesRelativeWithIntrinsicBounds(
                         openDrawable,
                         null,
                         null,
@@ -168,18 +179,20 @@ internal class PluginsPage : SettingsPage() {
                     )
                 }
             }
-            header.setCompoundDrawablesRelativeWithIntrinsicBounds(closedDrawable, null, null, null)
+            setCompoundDrawablesRelativeWithIntrinsicBounds(closedDrawable, null, null, null)
             val px = DimenUtils.dpToPx(5)
-            header.setPadding(px, px * 3, 0, px * 3)
-            addView(input)
-            addView(header)
-            addView(filterView)
-            addView(loadingIcon)
-            addView(recyclerView)
-            makeSearch("")
-            searchBox = input.editText
-            searchBox.setMaxLines(1)
-            searchBox.addTextChangedListener(object : TextWatcher {
+            setPadding(px, px * 3, 0, px * 3)
+        }
+
+        addView(input)
+        addView(header)
+        addView(filterView)
+        addView(loadingIcon)
+        addView(recyclerView)
+        makeSearch("")
+        searchBox = input.editText.apply {
+            maxLines = 1
+            addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
                     s: CharSequence,
                     start: Int,
@@ -190,35 +203,34 @@ internal class PluginsPage : SettingsPage() {
 
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
-                    if (s.toString().isEmpty()) {
-                        makeSearch("")
-                    }
+                    if (s.isEmpty()) makeSearch("")
                 }
             })
             searchBox.setOnEditorActionListener { _, actionId, event ->
                 if (actionId == EditorInfo.IME_ACTION_DONE || event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
-                    makeSearch(searchBox.getText().toString())
+                    makeSearch(searchBox.text.toString())
                 }
                 false
             }
-            val shit: NestedScrollView = linearLayout.parent as NestedScrollView
-            recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(
-                    recyclerView: RecyclerView,
-                    newState: Int
-                ) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    if (!requestMade && newState == ViewPager.SCROLL_STATE_IDLE && !shit.canScrollVertically(
-                            1
-                        )
-                    ) {
-                        index += 50
-                        requestMade = true
-                        makeSearch(searchBox.getText().toString(), index)
-                    }
-                }
-            })
         }
+
+        val shit: NestedScrollView = linearLayout.parent as NestedScrollView
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(
+                recyclerView: RecyclerView,
+                newState: Int
+            ) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (!requestMade && newState == ViewPager.SCROLL_STATE_IDLE && !shit.canScrollVertically(
+                        1
+                    )
+                ) {
+                    index += 50
+                    requestMade = true
+                    makeSearch(searchBox.text.toString(), index)
+                }
+            }
+        })
     }
 
     companion object {

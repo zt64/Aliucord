@@ -26,6 +26,9 @@ import java.io.File
 private data class CrashLog(val timestamp: String, val stacktrace: String, var times: Int)
 
 internal class CrashesPage : SettingsPage() {
+    private val p = DimenUtils.defaultPadding / 2
+    private val dir = File(Constants.CRASHLOGS_PATH)
+
     @Suppress("SetTextI18n")
     override fun onViewBound(view: View) {
         super.onViewBound(view)
@@ -33,9 +36,6 @@ internal class CrashesPage : SettingsPage() {
         setActionBarTitle("Crash Logs")
 
         val context = view.context
-        val p = DimenUtils.defaultPadding / 2
-
-        val dir = File(Constants.CRASHLOGS_PATH)
         val files = dir.listFiles().orEmpty()
 
         addHeaderButton("Open Crashlog Folder", R.e.ic_open_in_new_white_24dp) {
@@ -89,8 +89,10 @@ internal class CrashesPage : SettingsPage() {
                 }
                 TextView(context).run {
                     text = MDUtils.renderCodeBlock(
-                        context,
-                        SpannableStringBuilder(), null, stacktrace
+                        /* context = */ context,
+                        /* builder = */ SpannableStringBuilder(),
+                        /* language = */ null,
+                        /* content = */ stacktrace
                     )
                     setOnClickListener {
                         Utils.setClipboard("CrashLog-$timestamp", stacktrace)
@@ -103,8 +105,7 @@ internal class CrashesPage : SettingsPage() {
     }
 
     private fun getCrashes(): Map<Int, CrashLog>? {
-        val folder = File(Constants.CRASHLOGS_PATH)
-        val files = folder.listFiles { f -> f.isFile }
+        val files = dir.listFiles { f -> f.isFile }
             ?.sortedByDescending(File::lastModified)
             ?: return null
 

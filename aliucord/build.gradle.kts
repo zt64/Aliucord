@@ -6,9 +6,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     `maven-publish`
     `android-library`
-    id("com.aliucord.gradle")
+    alias(libs.plugins.aliucord.gradle)
     `kotlin-android`
-    id("org.jetbrains.dokka")
+    alias(libs.plugins.dokka)
 }
 
 aliucord {
@@ -23,6 +23,7 @@ kotlin {
 android {
     namespace = "com.aliucord"
     compileSdk = 34
+
     defaultConfig {
         minSdk = 24
         buildConfigField("String", "GIT_REVISION", "\"${getGitHash()}\"")
@@ -32,10 +33,6 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
-    }
-
-    kotlinOptions {
-        freeCompilerArgs += "-Xexplicit-api=warning"
     }
 
     compileOptions {
@@ -67,6 +64,7 @@ tasks {
             }
         }
     }
+
     create("pushDebuggable") {
         group = "aliucord"
 

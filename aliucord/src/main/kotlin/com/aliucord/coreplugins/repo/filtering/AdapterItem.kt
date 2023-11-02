@@ -3,9 +3,7 @@ package com.aliucord.coreplugins.repo.filtering
 import android.content.Context
 import android.text.method.LinkMovementMethod
 import android.view.View
-import android.widget.RelativeLayout
-import android.widget.Spinner
-import android.widget.TextView
+import android.widget.*
 import androidx.core.content.res.ResourcesCompat
 import com.aliucord.Constants
 import com.aliucord.Utils.createCheckedSetting
@@ -28,7 +26,7 @@ internal class AdapterItem(
             setTextColor(ColorCompat.getColor(context, R.c.primary_dark_200))
             textSize = 16.0f
             setPadding(px, px, px, px)
-            setTypeface(ResourcesCompat.getFont(context, Constants.Fonts.WHITNEY_SEMIBOLD))
+            typeface = ResourcesCompat.getFont(context, Constants.Fonts.WHITNEY_SEMIBOLD)
             movementMethod = LinkMovementMethod.getInstance()
         }
         addView(textView)
@@ -42,6 +40,6 @@ internal class AdapterItem(
         addView(setting)
         val params = setting!!.layoutParams as LayoutParams
         params.addRule(ALIGN_PARENT_RIGHT, TRUE)
-        setting!!.setLayoutParams(params)
+        setting!!.layoutParams = params
     }
 }

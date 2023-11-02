@@ -23,8 +23,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.reflect.KClass
 
+private const val FILENAME = "zeetcord.zip"
 private const val BASE_URL = "https://raw.githubusercontent.com/zt64/zeetcord/builds"
-private const val DEX_URL = "$BASE_URL/zeetcord.zip"
+private const val DEX_URL = "$BASE_URL/$FILENAME"
 private const val ALIUCORD_FROM_STORAGE_KEY = "AC_from_storage"
 
 private val BASE_DIRECTORY = Environment.getExternalStorageDirectory().resolve("Zeetcord")
@@ -58,7 +59,7 @@ private fun init(appActivity: AppActivity) {
     Logger.d("Initializing Zeetcord...")
 
     try {
-        val dexFile = File(appActivity.codeCacheDir, "zeetcord.zip")
+        val dexFile = appActivity.codeCacheDir.resolve(FILENAME)
 
         if (!useLocalDex(appActivity, dexFile) && !dexFile.exists()) {
             val successRef = AtomicBoolean(true)
@@ -88,7 +89,7 @@ private fun init(appActivity: AppActivity) {
         Logger.d("Finished initializing Zeetcord")
     } catch (th: Throwable) {
         error(appActivity, "Failed to initialize Zeetcord", th)
-        appActivity.codeCacheDir.resolve("zeetcord.zip").delete()
+        appActivity.codeCacheDir.resolve(FILENAME).delete()
     }
 }
 
@@ -108,7 +109,7 @@ private fun useLocalDex(appActivity: AppActivity, dexFile: File): Boolean {
     }
 
     if (useLocalDex) {
-        BASE_DIRECTORY.resolve("zeetcord.zip").run {
+        BASE_DIRECTORY.resolve(FILENAME).run {
             if (exists()) {
                 Logger.d("Loading dex from $absolutePath")
                 copyTo(dexFile, true)
@@ -125,11 +126,11 @@ private fun useLocalDex(appActivity: AppActivity, dexFile: File): Boolean {
  * outputFile should be new File(context.getCodeCacheDir(), "Zliucord.zip");
  */
 fun downloadLatestAliucordDex(outputFile: File) {
-    Logger.d("Downloading zeetcord.zip from $DEX_URL...")
+    Logger.d("Downloading $FILENAME from $DEX_URL...")
     URL(DEX_URL).openStream().use {
         it.copyTo(outputFile.outputStream())
     }
-    Logger.d("Finished downloading zeetcord.zip")
+    Logger.d("Finished downloading $FILENAME")
 }
 
 @Suppress("DiscouragedPrivateApi") // this private api seems to be stable, thanks to facebook who use it in the facebook app

@@ -11,18 +11,26 @@ import android.view.View
 import android.widget.TextView
 import com.aliucord.Utils
 import com.aliucord.entities.Plugin
-import com.aliucord.patcher.after
-import com.aliucord.patcher.instead
+import com.aliucord.patcher.*
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemThreadDraftForm
 import com.discord.widgets.chat.list.entries.ChatListEntry
 import com.discord.widgets.chat.list.entries.ThreadDraftFormEntry
 
 internal class PrivateThreads : Plugin(Manifest("PrivateThreads")) {
     override fun load(context: Context) {
-        patcher.instead<ThreadDraftFormEntry>("getCanCreatePrivateThread") { true }
+        GlobalPatcher.instead<ThreadDraftFormEntry>("getCanCreatePrivateThread") { true }
 
-        patcher.after<WidgetChatListAdapterItemThreadDraftForm>("onConfigure", Int::class.javaPrimitiveType!!, ChatListEntry::class.java) {
-            itemView.findViewById<TextView>(Utils.getResId("private_thread_toggle_badge", "id")).visibility = View.GONE
+        GlobalPatcher.after<WidgetChatListAdapterItemThreadDraftForm>(
+            "onConfigure",
+            Int::class.javaPrimitiveType!!,
+            ChatListEntry::class.java
+        ) {
+            itemView.findViewById<TextView>(
+                Utils.getResId(
+                    "private_thread_toggle_badge",
+                    "id"
+                )
+            ).visibility = View.GONE
         }
     }
 }

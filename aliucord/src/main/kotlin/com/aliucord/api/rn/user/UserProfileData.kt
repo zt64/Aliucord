@@ -12,5 +12,6 @@ public class UserProfileData(
     public val banner: String?,
     public val bio: String?,
     public val guildId: Long?,
+    public val pronouns: String,
     public val themeColors: IntArray?
 )

@@ -32,8 +32,6 @@ internal class AliucordSettingsPage : SettingsPage() {
         setActionBarTitle("Zeetcord")
         setActionBarSubtitle("Zeetcord Settings")
 
-        val ctx = view.context
-
         addHeader("Zeetcord Settings")
         addSwitch(
             AUTO_DISABLE_ON_CRASH_KEY,
@@ -45,7 +43,7 @@ internal class AliucordSettingsPage : SettingsPage() {
         addSwitch(AUTO_UPDATE_PLUGINS_KEY, "Automatically update plugins")
 
         if (StoreStream.getUserSettings().isDeveloperMode) {
-            addDivider(ctx)
+            addDivider()
             addHeader("Developer Settings")
             addSwitch(
                 ALIUCORD_FROM_STORAGE_KEY,
@@ -54,8 +52,8 @@ internal class AliucordSettingsPage : SettingsPage() {
             )
         }
 
-        addDivider(ctx)
-        addHeader(ctx, "Links")
+        addDivider()
+        addHeader("Links")
         addLink("Source Code", R.e.ic_account_github_white_24dp) {
             Utils.launchUrl(Constants.ALIUCORD_GITHUB_REPO)
         }
@@ -75,15 +73,13 @@ internal class AliucordSettingsPage : SettingsPage() {
     }
 
     private fun addLink(text: String, @DrawableRes drawable: Int, action: View.OnClickListener) {
-        val ctx = context
-
-        TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Icon).run {
+        TextView(context, null, 0, R.i.UiKit_Settings_Item_Icon).run {
             this.text = text
-            val drawableEnd = ContextCompat.getDrawable(ctx, R.e.ic_open_in_new_white_24dp)?.run {
+            val drawableEnd = ContextCompat.getDrawable(context, R.e.ic_open_in_new_white_24dp)?.run {
                 mutate()
                 Utils.tintToTheme(this)
             }
-            val drawableStart = ContextCompat.getDrawable(ctx, drawable)?.run {
+            val drawableStart = ContextCompat.getDrawable(context, drawable)?.run {
                 mutate()
                 Utils.tintToTheme(this)
             }
