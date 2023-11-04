@@ -16,7 +16,7 @@ internal class NoTrack : Plugin(Manifest("NoTrack")) {
     override fun load(context: Context) {
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false)
 
-        val map: MutableMap<String, List<String>> = HashMap()
+        val map = mutableMapOf<String, List<String>>()
 
         // com.google.firebase.crashlytics.internal.common.CommonUtils getMappingFileId
         // https://github.com/firebase/firebase-android-sdk/blob/master/firebase-crashlytics/src/main/java/com/google/firebase/crashlytics/internal/common/CommonUtils.java#L582

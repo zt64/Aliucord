@@ -9,14 +9,14 @@ import java.lang.reflect.Type
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 public class SettingsAPI internal constructor(plugin: String) {
-    private var settings: com.aliucord.SettingsUtilsJSON
+    private var settings: SettingsUtilsJSON
     private val pluginName: String
 
     /**
      * Creates a SettingsAPI for the specified plugin
      */
     init {
-        settings = com.aliucord.SettingsUtilsJSON(plugin)
+        settings = SettingsUtilsJSON(plugin)
         pluginName = plugin
     }
 
@@ -27,7 +27,7 @@ public class SettingsAPI internal constructor(plugin: String) {
      */
     public fun resetSettings(): Boolean {
         val isSuccessful = settings.resetFile()
-        settings = com.aliucord.SettingsUtilsJSON(pluginName)
+        settings = SettingsUtilsJSON(pluginName)
         return isSuccessful
     }
 

@@ -45,7 +45,7 @@ class AndroidLibraryPlugin : Plugin<Project> {
 
             dependencies {
                 val discord by configurations
-                // val implementation by configurations
+                val implementation by configurations
                 discord(libs.discord)
             }
 

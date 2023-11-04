@@ -1,10 +1,18 @@
 @file:Suppress("UnstableApiUsage")
 
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+}
+
 dependencyResolutionManagement {
     repositories {
+        maven("https://maven.aliucord.com/snapshots")
         mavenCentral()
         google()
-        gradlePluginPortal()
+
+        maven("https://jitpack.io")
     }
 
     versionCatalogs {
@@ -13,3 +21,5 @@ dependencyResolutionManagement {
         }
     }
 }
+
+// include("injector", "plugin")

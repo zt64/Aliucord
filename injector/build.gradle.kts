@@ -1,26 +1,19 @@
 @file:Suppress("UnstableApiUsage")
 
-plugins {
-    com.aliucord.core
-}
+import com.aliucord.gradle.ProjectType
 
-kotlin {
-    jvmToolchain(17)
+plugins {
+    id("com.aliucord.core")
 }
 
 aliucord {
-    projectType.set(com.aliucord.gradle.ProjectType.INJECTOR)
+    projectType = ProjectType.INJECTOR
 }
 
 android {
     buildFeatures {
         buildConfig = false
         androidResources = false
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
@@ -30,5 +23,5 @@ dependencies {
 }
 
 tasks.register("patchApk") {
-
+    dependsOn(tasks.build)
 }

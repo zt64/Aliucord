@@ -1,18 +1,3 @@
-/*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
-
 package com.aliucord.gradle.task
 
 import com.aliucord.gradle.ProjectType
@@ -33,15 +18,15 @@ fun Project.registerTasks() {
     val extension = extensions.getAliucord()
     val intermediates = layout.buildDirectory.dir("intermediates").get()
 
-    if (rootProject.tasks.findByName("generateUpdaterJson") == null) {
-        rootProject.tasks.register<GenerateUpdaterJsonTask>("generateUpdaterJson") {
-            group = TASK_GROUP
-
-            outputs.upToDateWhen { false }
-
-            outputFile = layout.buildDirectory.file("updater.json")
-        }
-    }
+    // if (rootProject.tasks.findByName("generateUpdaterJson") == null) {
+    //     rootProject.tasks.register<GenerateUpdaterJsonTask>("generateUpdaterJson") {
+    //         group = TASK_GROUP
+    //
+    //         outputs.upToDateWhen { false }
+    //
+    //         outputFile = layout.buildDirectory.file("updater.json")
+    //     }
+    // }
 
     tasks.register<GenSourcesTask>("genSources") {
         group = TASK_GROUP
@@ -55,11 +40,9 @@ fun Project.registerTasks() {
         this.pluginClassFile = pluginClassFile
 
         for (name in arrayOf("compileDebugJavaWithJavac", "compileDebugKotlin")) {
-            val task = tasks.named(name).orNull
-            if (task != null) {
-                dependsOn(task)
-                input.from(task.outputs)
-            }
+            val task = tasks.named(name).orNull ?: continue
+            dependsOn(task)
+            input.from(task.outputs)
         }
 
         outputFile = intermediates.file("classes.dex")
@@ -91,8 +74,7 @@ fun Project.registerTasks() {
     }
 
     afterEvaluate {
-        tasks.register(
-            name = "make",
+        val make by tasks.registering(
             type = if (extension.projectType.get() == ProjectType.INJECTOR) {
                 Copy::class
             } else {
@@ -102,7 +84,7 @@ fun Project.registerTasks() {
             group = TASK_GROUP
 
             val compileDexTask = compileDex.get()
-            dependsOn(compileDexTask)
+            dependsOn(compileDex)
 
             if (extension.projectType.get() == ProjectType.PLUGIN) {
                 val manifestFile = intermediates.file("manifest.json").asFile
@@ -142,6 +124,8 @@ fun Project.registerTasks() {
             if (extension.projectType.get() == ProjectType.INJECTOR) {
                 into(layout.buildDirectory)
                 rename { return@rename "injector.dex" }
+                // set output file as injector.dex
+
 
                 doLast {
                     logger.lifecycle("Copied injector.dex to ${layout.buildDirectory}")
@@ -153,7 +137,7 @@ fun Project.registerTasks() {
                 isPreserveFileTimestamps = false
                 archiveBaseName = "zeetcord"
                 archiveVersion = ""
-                destinationDirectory.set(layout.buildDirectory)
+                destinationDirectory = layout.buildDirectory
 
                 doLast {
                     logger.lifecycle("Made Zeetcord package at ${outputs.files.singleFile}")
@@ -163,7 +147,13 @@ fun Project.registerTasks() {
 
         tasks.register<DeployWithAdbTask>("deployWithAdb") {
             group = TASK_GROUP
-            dependsOn("make")
+            description = "Deploys to a device using ADB"
+            file = make.get().outputs.files.singleFile
+
+            if (extension.projectType.get() == ProjectType.INJECTOR) file = file.get().asFile.resolve("injector.dex")
+            if (extension.projectType.get() == ProjectType.PLUGIN) devicePath += "/plugins/"
+
+            dependsOn(make)
         }
     }
 }

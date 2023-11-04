@@ -3,7 +3,6 @@
 package com.aliucord.coreplugins.repo
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -20,7 +19,7 @@ internal class BottomShit : BottomSheet() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
-        val ctx: Context = requireContext()
+        val ctx = requireContext()
         setPadding(20)
         val title = TextView(ctx, null, 0, R.i.UiKit_Settings_Item_Header).apply {
             text = "PluginRepo"
@@ -28,11 +27,11 @@ internal class BottomShit : BottomSheet() {
             setGravity(Gravity.START)
         }
 
-        val notifyNewPlugins: CheckedSetting = Utils.createCheckedSetting(
-            ctx,
-            CheckedSetting.ViewType.CHECK,
-            "Notify new plugins",
-            ""
+        val notifyNewPlugins = Utils.createCheckedSetting(
+            context = ctx,
+            type = CheckedSetting.ViewType.CHECK,
+            text = "Notify new plugins",
+            subtext = ""
         )
         notifyNewPlugins.isChecked = settingsAPI.getBool("checkNewPlugins", true)
         notifyNewPlugins.setOnCheckedListener { aBoolean ->

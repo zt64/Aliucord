@@ -1,18 +1,3 @@
-/*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
-
 package com.aliucord.gradle.task
 
 import com.aliucord.gradle.AliucordExtension
@@ -27,6 +12,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.*
+import org.gradle.kotlin.dsl.getByName
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.tree.ClassNode
 import org.slf4j.LoggerFactory
@@ -49,10 +35,9 @@ abstract class CompileDexTask : DefaultTask() {
     @Suppress("UnstableApiUsage")
     @TaskAction
     fun compileDex() {
-        val android: BaseExtension = project.extensions.getByName("android") as BaseExtension
+        val android: BaseExtension = project.extensions.getByName<BaseExtension>("android")
 
         val aliucord: AliucordExtension = project.extensions.getAliucord()
-        val dexOutputDir = outputFile.get().asFile.parentFile!!
 
         Closer.create().use { closer ->
             val dexBuilder = DexArchiveBuilder.createD8DexBuilder(
@@ -80,6 +65,7 @@ abstract class CompileDexTask : DefaultTask() {
             Arrays.stream(fileStreams).flatMap { it }
                 .use { classesInput ->
                     val files = classesInput.collect(Collectors.toList())
+                    val dexOutputDir = outputFile.get().asFile.parentFile!!
 
                     dexBuilder.convert(
                         input = files.stream(),
@@ -92,22 +78,22 @@ abstract class CompileDexTask : DefaultTask() {
                         val classNode = ClassNode()
                         reader.accept(classNode, 0)
 
-                        for (annotation in classNode.visibleAnnotations.orEmpty() + classNode.invisibleAnnotations.orEmpty()) {
-                            if (annotation.desc == "Lcom/aliucord/annotations/AliucordPlugin;") {
-                                requireNotNull(aliucord.pluginClassName) {
-                                    "Only 1 active plugin class per project is supported"
-                                }
-
-                                for (method in classNode.methods) {
-                                    if (method.name == "getManifest" && method.desc == "()Lcom/aliucord/entities/Plugin\$Manifest;") {
-                                        throw IllegalArgumentException("Plugin class cannot override getManifest, use manifest.json system!")
-                                    }
-                                }
-
-                                aliucord.pluginClassName = classNode.name.replace('/', '.')
-                                    .also { pluginClassFile.asFile.orNull?.writeText(it) }
-                            }
-                        }
+                        // for (annotation in classNode.visibleAnnotations.orEmpty() + classNode.invisibleAnnotations.orEmpty()) {
+                        //     if (annotation.desc == "Lcom/aliucord/annotations/AliucordPlugin;") {
+                        //         requireNotNull(aliucord.pluginClassName) {
+                        //             "Only 1 active plugin class per project is supported"
+                        //         }
+                        //
+                        //         for (method in classNode.methods) {
+                        //             if (method.name == "getManifest" && method.desc == "()Lcom/aliucord/entities/Plugin\$Manifest;") {
+                        //                 throw IllegalArgumentException("Plugin class cannot override getManifest, use manifest.json system!")
+                        //             }
+                        //         }
+                        //
+                        //         aliucord.pluginClassName = classNode.name.replace('/', '.')
+                        //             .also { pluginClassFile.asFile.orNull?.writeText(it) }
+                        //     }
+                        // }
                     }
                 }
         }

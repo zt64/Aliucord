@@ -1,23 +1,25 @@
 @file:Suppress("UnstableApiUsage")
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.aliucord.gradle.ProjectType
 
-@Suppress("DSL_SCOPE_VIOLATION")
+
+// import com.aliucord.gradle.ProjectType
+
 plugins {
     `maven-publish`
-    `android-library`
-    alias(libs.plugins.aliucord.gradle)
-    `kotlin-android`
+    alias(libs.plugins.android.library)
+    id("com.aliucord.gradle")
+    alias(libs.plugins.kotlin)
     alias(libs.plugins.dokka)
 }
 
-aliucord {
-    projectType = com.aliucord.gradle.ProjectType.CORE
+kotlin {
+    explicitApi()
+    jvmToolchain(17)
 }
 
-kotlin {
-    jvmToolchain(17)
-    explicitApi()
+aliucord {
+    projectType = ProjectType.CORE
 }
 
 android {
@@ -97,18 +99,19 @@ afterEvaluate {
         }
 
         repositories {
-            val username = System.getenv("MAVEN_USERNAME")
-            val password = System.getenv("MAVEN_PASSWORD")
+            val username = System.getenv("GITHUB_ACTOR")
+            val password = System.getenv("GITHUB_TOKEN")
 
             if (username == null || password == null) {
                 mavenLocal()
             } else {
                 maven {
+                    name = "GitHubPackages"
+                    setUrl("https://maven.pkg.github.com/zt64/zeetcord")
                     credentials {
                         this.username = username
                         this.password = password
                     }
-                    setUrl("https://maven.aliucord.com/snapshots")
                 }
             }
         }

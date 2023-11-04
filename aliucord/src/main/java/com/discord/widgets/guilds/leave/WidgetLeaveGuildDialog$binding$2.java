@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.discord.databinding.LeaveGuildDialogBinding;
 
+@SuppressWarnings("unused")
 public class WidgetLeaveGuildDialog$binding$2 {
     public static WidgetLeaveGuildDialog$binding$2 INSTANCE;
 

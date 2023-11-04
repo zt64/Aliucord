@@ -16,7 +16,7 @@ import com.aliucord.Utils.promptRestart
 import com.aliucord.Utils.showToast
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.ConfirmDialog
-import com.aliucord.utils.ChangelogUtils
+import com.aliucord.utils.ChangelogUtils.FooterAction
 import com.aliucord.utils.ChangelogUtils.show
 import com.discord.app.AppFragment
 import com.discord.widgets.user.usersheet.WidgetUserSheet
@@ -78,14 +78,13 @@ internal class PluginsAdapter(
         val (_, _, _, _, version, _, changelog, changelogMedia) = p.manifest
 
         if (changelog == null) return
-        val url = getGithubUrl(p)
 
         show(
             context = ctx,
             version = "${p.name} v$version",
             media = changelogMedia,
             body = changelog,
-            ChangelogUtils.FooterAction(R.e.ic_account_github_white_24dp, url)
+            FooterAction(R.e.ic_account_github_white_24dp, getGithubUrl(p))
         )
     }
 

@@ -31,6 +31,6 @@ internal class ButtonsAPI : Plugin(Manifest("ButtonsAPI")) {
     }
 
     companion object {
-        val actions = HashMap<String, (Message, FragmentActivity) -> Unit>()
+        val actions: HashMap<String, (Message, FragmentActivity) -> Unit> = hashMapOf()
     }
 }

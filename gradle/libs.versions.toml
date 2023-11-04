@@ -6,7 +6,6 @@ android-gradle = "8.1.2"
 appcompat = "1.4.1"
 dokka = "1.8.10"
 aliuhook = "main-SNAPSHOT"
-aliucord-gradle = "unspecified"
 discord = "126021"
 #noinspection GradleDependency causes errors
 material = "1.5.0"
@@ -32,6 +31,5 @@ jadx-dex-input = { module = "com.aliucord.jadx:jadx-dex-input", version.ref = "j
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "android-gradle" }
-aliucord-gradle = { id = "com.aliucord.gradle", version.ref = "aliucord-gradle" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 compatibility = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.13.2" }

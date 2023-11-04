@@ -36,23 +36,23 @@ internal class CoreCommands : Plugin(Manifest("CoreCommands")) {
                 )
             )
         ) {
-            val showVersions = it.getBoolOrDefault("versions", false)
-
             val plugins = PluginManager.plugins
-            val (enabled, disabled) = plugins.values.partition(PluginManager::isPluginEnabled)
-            val enabledStr = enabled.formatPlugins(showVersions)
-            val disabledStr = disabled.formatPlugins(showVersions)
 
             if (plugins.isEmpty()) {
                 CommandResult("No plugins installed", send = false)
             } else {
+                val (enabled, disabled) = plugins.values.partition(PluginManager::isPluginEnabled)
+                val showVersions = it.getBoolOrDefault("versions", false)
+                val enabledStr = enabled.formatPlugins(showVersions)
+                val disabledStr = disabled.formatPlugins(showVersions)
+
                 CommandResult(
-                    """
-            **Enabled Plugins (${enabled.size}):**
-            ${if (enabled.isEmpty()) "None" else "> $enabledStr"}
-            **Disabled Plugins (${disabled.size}):**
-            ${if (disabled.isEmpty()) "None" else "> $disabledStr"}
-                            """,
+                    content = """
+                    **Enabled Plugins (${enabled.size}):**
+                    ${if (enabled.isEmpty()) "None" else "> $enabledStr"}
+                    **Disabled Plugins (${disabled.size}):**
+                    ${if (disabled.isEmpty()) "None" else "> $disabledStr"}
+                    """,
                     send = it.getBoolOrDefault("send", false)
                 )
             }
@@ -61,11 +61,11 @@ internal class CoreCommands : Plugin(Manifest("CoreCommands")) {
         commands.registerCommand("debug", "Posts debug info") {
             // .trimIndent() is broken sadly due to collision with Discord's Kotlin
             val str = """
-**Debug Info:**
-> Discord: ${Constants.DISCORD_VERSION}
-> Zeetcord: ${BuildConfig.GIT_REVISION} (${PluginManager.plugins.size} plugins)
-> System: Android ${Build.VERSION.RELEASE} (SDK v${Build.VERSION.SDK_INT}) - ${getArchitecture()}
-> Rooted: ${getIsRooted() ?: "Unknown"}
+            **Debug Info:**
+            > Discord: ${Constants.DISCORD_VERSION}
+            > Zeetcord: ${BuildConfig.GIT_REVISION} (${PluginManager.plugins.size} plugins)
+            > System: Android ${Build.VERSION.RELEASE} (SDK v${Build.VERSION.SDK_INT}) - ${getArchitecture()}
+            > Rooted: ${getIsRooted() ?: "Unknown"}
             """
 
             CommandResult(str)

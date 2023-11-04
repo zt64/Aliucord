@@ -55,7 +55,7 @@ public object PluginManager {
             loader.getResourceAsStream("manifest.json").use { stream ->
                 if (stream == null) {
                     failedToLoad[file] = "No manifest found"
-                    logger.error("Failed to load plugin $fileName: No manifest found", null)
+                    logger.error("Failed to load plugin $fileName: No manifest found")
                     return
                 }
 
@@ -80,7 +80,7 @@ public object PluginManager {
                 )
             val pluginInstance = pluginClass.getDeclaredConstructor().newInstance()
             if (name in plugins) {
-                logger.error("Plugin with name $name already exists", null)
+                logger.error("Plugin with name $name already exists")
                 return
             }
             pluginInstance.__filename = fileName
@@ -90,6 +90,7 @@ public object PluginManager {
                 val addAssetPath =
                     AssetManager::class.java.getMethod("addAssetPath", String::class.java)
                 addAssetPath(assets, file.absolutePath)
+                @Suppress("DEPRECATION")
                 pluginInstance.resources = Resources(
                     assets,
                     context.resources.displayMetrics,

@@ -37,17 +37,18 @@ public class ConfirmDialog : AppDialog(resId) {
 
         binding = `WidgetLeaveGuildDialog$binding$2`.INSTANCE(view)
 
-        val okButton = oKButton.apply {
+        oKButton.apply {
             setText("OK")
             setIsLoading(false)
             setOnClickListener(onOkListener ?: View.OnClickListener { dismiss() })
+            val btnColor = if (isDangerous) {
+                R.c.uikit_btn_bg_color_selector_red
+            } else {
+                R.c.uikit_btn_bg_color_selector_brand
+            }
+            setBackgroundColor(ContextCompat.getColor(view.context, btnColor))
         }
-        val btnColor = if (isDangerous) {
-            R.c.uikit_btn_bg_color_selector_red
-        } else {
-            R.c.uikit_btn_bg_color_selector_brand
-        }
-        okButton.setBackgroundColor(ContextCompat.getColor(view.context, btnColor))
+
         cancelButton.setOnClickListener(onCancelListener ?: View.OnClickListener { dismiss() })
         header.text = title ?: "Confirm"
         body.apply {

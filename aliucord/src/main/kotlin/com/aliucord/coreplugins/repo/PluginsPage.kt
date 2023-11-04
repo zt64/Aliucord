@@ -43,25 +43,25 @@ internal class PluginsPage : SettingsPage() {
     private val pluginsDir = File(Constants.PLUGINS_PATH)
 
     @Suppress("NotifyDataSetChanged")
-    fun makeSearch(input: String?, index: Int) {
-        if (adapter != null && adapter!!.data.size >= index) {
-            Utils.threadPool.execute {
+    private fun makeSearch(input: String?, index: Int) {
+        if (adapter == null || adapter!!.data.size < index) return
+        Utils.threadPool.execute {
+            if (index == 0) {
                 Utils.mainThread.post {
-                    if (index == 0) {
-                        loadingIcon!!.visibility = View.VISIBLE
-                        adapter!!.data = ArrayList()
-                        adapter!!.notifyDataSetChanged()
-                    }
+                    loadingIcon!!.visibility = View.VISIBLE
+                    adapter!!.data = arrayListOf()
+                    adapter!!.notifyDataSetChanged()
                 }
-                val plugs = PluginRepoAPI.getPlugins(input, index)
-                adapter!!.data.addAll(plugs)
-                Utils.mainThread.post {
-                    loadingIcon!!.visibility = View.GONE
-                    if (plugs.isNotEmpty()) adapter!!.notifyDataSetChanged()
-                    setActionBarSubtitle("${adapter!!.data.size} Shown")
-                }
-                requestMade = false
             }
+
+            val plugs = PluginRepoAPI.getPlugins(input, index)
+            adapter!!.data.addAll(plugs)
+            Utils.mainThread.post {
+                loadingIcon!!.visibility = View.GONE
+                if (plugs.isNotEmpty()) adapter!!.notifyDataSetChanged()
+                setActionBarSubtitle("${adapter!!.data.size} Shown")
+            }
+            requestMade = false
         }
     }
 
@@ -70,16 +70,19 @@ internal class PluginsPage : SettingsPage() {
         searchBox.clearFocus()
     }
 
-    fun makeSearch(input: String?) = makeSearch(input, 0)
+    private fun makeSearch(input: String?) = makeSearch(input, 0)
 
     @Suppress("SetTextI18n")
     override fun onViewBound(view: View) {
         super.onViewBound(view)
+
         setActionBarTitle("Plugin Repo")
+        setActionBarSubtitle("Loading...")
+
         val context = view.context
         val p = defaultPadding / 2
+
         PluginRepoAPI.filters = hashMapOf()
-        setActionBarSubtitle("Loading...")
 
         if (headerBar.findViewById<View?>(uniqueId) != null) return
 
@@ -134,24 +137,10 @@ internal class PluginsPage : SettingsPage() {
             isIndeterminate = true
             visibility = View.GONE
         }
-        val filterAdapter = FilterAdapter(this)
 
-        // https://github.com/Vendicated/AliucordPlugins/blob/main/DedicatedPluginSettings/src/main/java/dev/vendicated/aliucordplugs/dps/DedicatedPluginSettings.java#L63-L80
-        val openDrawable = ContextCompat.getDrawable(context, R.e.ic_arrow_down_14dp)!!.mutate().apply {
-            setTint(ColorCompat.getThemedColor(context, R.b.colorInteractiveNormal))
-        }
-        val closedDrawable = object : LayerDrawable(arrayOf(openDrawable)) {
-            override fun draw(canvas: Canvas) {
-                val bounds = openDrawable.getBounds()
-                canvas.save()
-                canvas.rotate(270f, bounds.width() / 2f, bounds.height() / 2f)
-                super.draw(canvas)
-                canvas.restore()
-            }
-        }
         val filterView = RecyclerView(context).apply {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-            adapter = filterAdapter
+            adapter = FilterAdapter(this@PluginsPage)
             addItemDecoration(decoration)
             setPadding(0, defaultPadding, 0, 0)
             visibility = View.GONE
@@ -159,6 +148,19 @@ internal class PluginsPage : SettingsPage() {
         val header = TextView(context, null, 0, R.i.UiKit_Settings_Item_Header).apply {
             text = "Filters"
             typeface = ResourcesCompat.getFont(context, WHITNEY_SEMIBOLD)
+            // https://github.com/Vendicated/AliucordPlugins/blob/main/DedicatedPluginSettings/src/main/java/dev/vendicated/aliucordplugs/dps/DedicatedPluginSettings.java#L63-L80
+            val openDrawable = ContextCompat.getDrawable(context, R.e.ic_arrow_down_14dp)!!.mutate().apply {
+                setTint(ColorCompat.getThemedColor(context, R.b.colorInteractiveNormal))
+            }
+            val closedDrawable = object : LayerDrawable(arrayOf(openDrawable)) {
+                override fun draw(canvas: Canvas) {
+                    val bounds = openDrawable.getBounds()
+                    canvas.save()
+                    canvas.rotate(270f, bounds.width() / 2f, bounds.height() / 2f)
+                    super.draw(canvas)
+                    canvas.restore()
+                }
+            }
             setOnClickListener {
                 TransitionManager.beginDelayedTransition(linearLayout)
                 if (filterView.visibility == View.VISIBLE) {
@@ -201,12 +203,12 @@ internal class PluginsPage : SettingsPage() {
                 ) {
                 }
 
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) { }
                 override fun afterTextChanged(s: Editable) {
                     if (s.isEmpty()) makeSearch("")
                 }
             })
-            searchBox.setOnEditorActionListener { _, actionId, event ->
+            setOnEditorActionListener { _, actionId, event ->
                 if (actionId == EditorInfo.IME_ACTION_DONE || event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
                     makeSearch(searchBox.text.toString())
                 }
@@ -214,7 +216,7 @@ internal class PluginsPage : SettingsPage() {
             }
         }
 
-        val shit: NestedScrollView = linearLayout.parent as NestedScrollView
+        val shit = linearLayout.parent as NestedScrollView
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(
                 recyclerView: RecyclerView,
@@ -233,7 +235,7 @@ internal class PluginsPage : SettingsPage() {
         })
     }
 
-    companion object {
+    private companion object {
         private val uniqueId = View.generateViewId()
     }
 }

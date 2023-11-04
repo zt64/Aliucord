@@ -26,7 +26,7 @@ internal object PluginUpdater {
     // Synchronized to avoid ConcurrentModificationException
     val cache: MutableMap<String?, CachedData> = Collections.synchronizedMap(hashMapOf<String?, CachedData>())
     private val updated: MutableMap<String, String?> = Collections.synchronizedMap(hashMapOf<String, String?>())
-    val updates: MutableList<String> = Collections.synchronizedList(ArrayList())
+    val updates: MutableList<String> = Collections.synchronizedList(arrayListOf())
     private val resType = TypeToken.getParameterized(
         MutableMap::class.java,
         String::class.java,

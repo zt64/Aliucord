@@ -247,7 +247,7 @@ public object Utils {
         }
     }
 
-    private val resIdCache = HashMap<String, Int>()
+    private val resIdCache = hashMapOf<String, Int>()
 
     /**
      * Get resource id from discord package.

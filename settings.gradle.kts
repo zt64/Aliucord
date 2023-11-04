@@ -2,16 +2,17 @@
 
 pluginManagement {
     repositories {
-        mavenLocal()
         google()
         gradlePluginPortal()
         maven("https://jitpack.io")
         maven("https://maven.aliucord.com/snapshots")
     }
+    includeBuild("gradle-api")
+    includeBuild("build-logic")
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
         mavenCentral()
         google()
@@ -20,8 +21,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Aliucord"
+rootProject.name = "Zeetcord"
 
 include(":aliucord")
 include(":injector")
-include(":plugin")

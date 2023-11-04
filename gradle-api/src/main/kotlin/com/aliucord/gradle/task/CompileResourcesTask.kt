@@ -39,7 +39,7 @@ abstract class CompileResourcesTask : DefaultTask() {
     abstract val outputFile: RegularFileProperty
 
     @get:Inject
-    abstract val execOperatations: ExecOperations
+    abstract val execOperations: ExecOperations
 
     @TaskAction
     fun action() {
@@ -51,13 +51,13 @@ abstract class CompileResourcesTask : DefaultTask() {
 
         val tmpRes = File.createTempFile("res", ".zip")
 
-        execOperatations.exec {
+        execOperations.exec {
             executable = aaptExecutable.path
             args("compile")
             args("--dir", input.asFile.get().path)
             args("-o", tmpRes.path)
         }
-        execOperatations.exec {
+        execOperations.exec {
             executable = aaptExecutable.path
             args("link")
             args(

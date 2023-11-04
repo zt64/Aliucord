@@ -1,6 +1,5 @@
 package com.aliucord.coreplugins.repo
 
-import android.content.Context
 import com.aliucord.*
 import com.aliucord.coreplugins.repo.filtering.Developer
 import com.aliucord.entities.Plugin
@@ -13,7 +12,7 @@ import java.io.IOException
 
 internal object PluginRepoAPI {
     private const val API_URL = "https://mantikralligi1.pythonanywhere.com"
-    var localFilters = HashMap<String, Any>()
+    var localFilters = hashMapOf<String, Any>()
     var filters: MutableMap<String?, String?> = mutableMapOf()
     var logger = Logger("PluginRepoAPI")
     val plugins: List<Plugin>
@@ -22,7 +21,7 @@ internal object PluginRepoAPI {
     private fun getPlugins(query: String?): List<Plugin> = getPlugins(query, 0)
 
     fun getPlugins(query: String?, index: Int): List<Plugin> {
-        val plugins = ArrayList<Plugin>()
+        val plugins = arrayListOf<Plugin>()
         try {
             val filter = JSONObject(filters.toMap()).apply {
                 put("index", index)
@@ -49,23 +48,25 @@ internal object PluginRepoAPI {
         return plugins
     }
 
-    fun checkNewPlugins(): Boolean {
-        return try {
-            val pluginID = Http.simpleGet("$API_URL/getLastPlugin").toInt()
-            val lastID: Int = PluginRepo.settingsAPI.getInt("lastPluginID", 0)
-            if (lastID == 0) {
+    fun checkNewPlugins(): Boolean = try {
+        val pluginID = Http.simpleGet("$API_URL/getLastPlugin").toInt()
+        val lastID = PluginRepo.settingsAPI.getInt("lastPluginID", 0)
+        when {
+            lastID == 0 -> {
                 PluginRepo.settingsAPI.setInt("lastPluginID", pluginID)
-                false
-            } else if (lastID < pluginID) {
-                PluginRepo.settingsAPI.setInt("lastPluginID", pluginID)
-                true
-            } else {
                 false
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
+
+            lastID < pluginID -> {
+                PluginRepo.settingsAPI.setInt("lastPluginID", pluginID)
+                true
+            }
+
+            else -> false
         }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
     }
 
     private fun getPluginFromJson(json: JSONObject): Plugin {
@@ -80,13 +81,7 @@ internal object PluginRepoAPI {
             updateUrl = json.getString("download_link") // I know this is not updateurl
         )
 
-        return object : Plugin(manifest) {
-            override fun start(context: Context) {
-            }
-
-            override fun stop(context: Context) {
-            }
-        }
+        return object : Plugin(manifest) {}
     }
 
     fun installPlugin(pluginName: String, url: String?): Boolean {
@@ -111,13 +106,13 @@ internal object PluginRepoAPI {
         return success
     }
 
+    private val developersType = TypeToken.getParameterized(
+        ArrayList::class.java, Developer::class.java
+    ).type
+
     val developers: List<Developer>
         get() = try {
-            GsonUtils.gson.fromJson(
-                Http.simpleGet("$API_URL/getDevelopers"), TypeToken.getParameterized(
-                    ArrayList::class.java, Developer::class.java
-                ).type
-            )
+            GsonUtils.gson.fromJson(Http.simpleGet("$API_URL/getDevelopers"), developersType)
         } catch (e: Exception) {
             emptyList()
         }

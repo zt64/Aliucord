@@ -15,19 +15,16 @@ import com.discord.app.AppFragment
 import com.discord.utilities.color.ColorCompat
 import com.discord.views.CheckedSetting
 
-internal class FilterAdapter(fragment: AppFragment) :
-    RecyclerView.Adapter<FilterAdapter.ViewHolder?>() {
+internal class FilterAdapter(fragment: AppFragment) : RecyclerView.Adapter<FilterAdapter.ViewHolder?>() {
     var fragment: AppFragment
     var ctx: Context
-    private var filters: List<String> = mutableListOf("Author", "Sort By", "Show Installed Plugins")
-    var developers: MutableList<Developer> = mutableListOf()
-    var sortOptions: List<SortOption> = ArrayList(
-        listOf(
-            SortOption("None", ""),
-            SortOption("Last Updated", "timestamp"),
-            SortOption("Last Added", "ID"),
-            SortOption("Most Starred", "repo_stars")
-        )
+    private var filters = mutableListOf("Author", "Sort By", "Show Installed Plugins")
+    var developers = mutableListOf<Developer>()
+    var sortOptions = listOf(
+        SortOption("None", ""),
+        SortOption("Last Updated", "timestamp"),
+        SortOption("Last Added", "ID"),
+        SortOption("Most Starred", "repo_stars")
     )
     private var viewCount = -2
 
@@ -86,7 +83,7 @@ internal class FilterAdapter(fragment: AppFragment) :
             item = itemView as AdapterItem
             when (item.viewType) {
                 -1, 0 -> {
-                    val spinner: Spinner = item.setting as Spinner
+                    val spinner = item.setting as Spinner
                     spinner.setSelection(0, false)
                     spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                         override fun onItemSelected(
@@ -103,9 +100,14 @@ internal class FilterAdapter(fragment: AppFragment) :
                                 )
                             )
                             when (item.type) {
-                                FilterType.SORTED -> if (sortOptions[position].toString() != "None") PluginRepoAPI.filters["sort_by"] =
-                                    sortOptions[position].optionValue else refresh =
-                                    null != PluginRepoAPI.filters.remove("sort_by")
+                                FilterType.SORTED -> when {
+                                    sortOptions[position].toString() == "None" -> {
+                                        refresh = null != PluginRepoAPI.filters.remove("sort_by")
+                                    }
+                                    else -> {
+                                        PluginRepoAPI.filters["sort_by"] = sortOptions[position].optionValue
+                                    }
+                                }
 
                                 FilterType.AUTHOR -> if (developers[position].ID != 0) PluginRepoAPI.filters["author"] =
                                     developers[position].ID.toString() else refresh =

@@ -154,16 +154,14 @@ internal class CommandHandler : Plugin(Manifest("CommandHandler")) {
     }
 
     private fun HashMap<String, Any?>.addValues(values: Collection<ApplicationCommandValue>) {
-        values.forEach { v ->
-            val name = v.name
-            val value = v.value
-            val options = v.options
-
+        values.forEach { (name, value, _, options) ->
             if (value == null && options != null) {
                 val optionsMap = linkedMapOf<String, Any?>()
                 addValues(options)
                 put(name, optionsMap)
-            } else put(name, value)
+            } else {
+                put(name, value)
+            }
         }
     }
 }

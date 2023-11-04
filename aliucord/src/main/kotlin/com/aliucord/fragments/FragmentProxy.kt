@@ -431,7 +431,7 @@ public open class FragmentProxy : Fragment(), AppComponent {
 
     public companion object {
         @JvmField
-        public val fragments: MutableMap<String?, Fragment> = HashMap()
+        public val fragments: MutableMap<String?, Fragment> = hashMapOf()
 
         private lateinit var _mFragmentManager: Field
         private var Fragment.mFragmentManager: FragmentManager?

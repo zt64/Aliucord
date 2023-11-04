@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.discord.databinding.WidgetKickUserBinding;
 
+@SuppressWarnings("unused")
 public class WidgetKickUser$binding$2 {
     public static WidgetKickUser$binding$2 INSTANCE;
 
