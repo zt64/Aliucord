@@ -36,7 +36,6 @@ jobs:
       - name: Build Zeetcord
         run: |
           cd $GITHUB_WORKSPACE/src
-          ./gradlew :plugin:publishToMavenLocal
           ./gradlew :aliucord:make
           cp aliucord/build/zeetcord.zip $GITHUB_WORKSPACE/builds
         # env:

@@ -24,7 +24,6 @@ jobs:
 
       - name: Build Zeetcord
         run: |
-          ./gradlew :plugin:publishToMavenLocal
           ./gradlew :aliucord:publish -Pversion=${GITHUB_REF##*/}-SNAPSHOT
           ./gradlew :aliucord:publish -Pversion=$(git rev-parse --short "$GITHUB_SHA") | exit 0
         env:

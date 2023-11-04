@@ -35,7 +35,6 @@ jobs:
       - name: Build Injector
         run: |
           cd $GITHUB_WORKSPACE/src
-          ./gradlew :plugin:publishToMavenLocal
           ./gradlew :injector:make
           cp injector/build/injector.dex $GITHUB_WORKSPACE/builds
 
