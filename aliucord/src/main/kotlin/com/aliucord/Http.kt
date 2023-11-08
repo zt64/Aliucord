@@ -216,8 +216,7 @@ public object Http {
      * @param boundary Boundary
      * @param outputStream [OutputStream] to write to. Should optimally be the result of connection.getOutputStream()
      */
-    public class MultiPartBuilder(boundary: String, private val outputStream: OutputStream) :
-        Closeable {
+    public class MultiPartBuilder(boundary: String, private val outputStream: OutputStream) : Closeable {
         private val boundary: ByteArray
 
         init {
@@ -314,8 +313,7 @@ public object Http {
     }
 
     /** Request Builder  */
-    public class Request @JvmOverloads constructor(url: String?, method: String = "GET") :
-        Closeable {
+    public class Request @JvmOverloads constructor(url: String?, method: String = "GET") : Closeable {
         /** The connection of this Request  */
         public val conn: HttpURLConnection
 
@@ -501,6 +499,7 @@ public object Http {
              * @param builder QueryBuilder
              * @throws IOException If an I/O exception occurs
              */
+            @JvmStatic
             @Throws(IOException::class)
             public fun newDiscordRequest(builder: QueryBuilder): Request {
                 return newDiscordRequest(builder.toString())
@@ -513,6 +512,7 @@ public object Http {
              * @param method [HTTP method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
              * @throws IOException If an I/O exception occurs
              */
+            @JvmStatic
             @JvmOverloads
             @Throws(IOException::class)
             public fun newDiscordRequest(route: String, method: String = "GET"): Request {
@@ -536,6 +536,7 @@ public object Http {
              * @param builder QueryBuilder
              * @throws IOException If an I/O exception occurs
              */
+            @JvmStatic
             @Throws(IOException::class)
             public fun newDiscordRNRequest(builder: QueryBuilder): Request {
                 return newDiscordRNRequest(builder.toString(), "GET")
@@ -548,6 +549,7 @@ public object Http {
              * @param method [HTTP method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
              * @throws IOException If an I/O exception occurs
              */
+            @JvmStatic
             @JvmOverloads
             @Throws(IOException::class)
             public fun newDiscordRNRequest(route: String, method: String = "GET"): Request {
