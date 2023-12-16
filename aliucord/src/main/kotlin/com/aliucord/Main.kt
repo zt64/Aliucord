@@ -354,19 +354,17 @@ public object Main {
             return logger.error("Failed to create directories!")
         }
 
-        val a = dir
+        dir
             .listFiles { f -> f.extension == "zip" }
             ?.sorted()
             ?.map {
-                Utils.threadPool.submit {
-                    try {
-                        loadPlugin(context, it)
-                    } catch (e: Throwable) {
-                        logger.error("Failed to load plugin: ${it.name}", e)
-                    }
+                try {
+                    loadPlugin(context, it)
+                } catch (e: Throwable) {
+                    logger.error("Failed to load plugin: ${it.name}", e)
                 }
             }
-        Utils.threadPool.invokeAll(a)
+
         if (PluginManager.failedToLoad.isNotEmpty()) {
             showToast("Some plugins failed to load. Check the plugins page for more info.")
         }

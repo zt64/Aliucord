@@ -1,4 +1,4 @@
-name: Build Injector
+name: Build APK
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - injector/**
 
 jobs:
-  build-injector:
+  build-apk:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,11 +32,11 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Build Injector
+      - name: Build APK
         run: |
           cd $GITHUB_WORKSPACE/src
-          ./gradlew :injector:make
-          cp injector/build/injector.dex $GITHUB_WORKSPACE/builds
+          ./gradlew :injector:generateApk
+          cp injector/build/zeetcord.apk $GITHUB_WORKSPACE/builds
 
       - name: Push builds
         run: |
