@@ -60,10 +60,11 @@ internal class UpdaterPluginCard(context: Context, plugin: String, forceUpdate: 
             useDefaultMargins = true
             setPadding(0, 0, 0, 0)
         }
-        tv = TextView(context, null, 0, R.i.UiKit_TextView_Subtext)
-        try {
+        val verid = generateViewId()
+        tv = TextView(context, null, 0, R.i.UiKit_TextView_Subtext).apply {
             val info = PluginUpdater.getUpdateInfo(p)
-            tv.text = "v${p.manifest.version} -> v${info?.version ?: "?"}"
+            this.id = verid
+            text = "v${p.manifest.version} -> v${info?.version ?: "?"}"
             if (info?.changelog != null) {
                 val changeLogButton = ToolbarButton(context).apply {
                     setImageDrawable(ContextCompat.getDrawable(context, R.e.ic_history_white_24dp))
@@ -80,11 +81,7 @@ internal class UpdaterPluginCard(context: Context, plugin: String, forceUpdate: 
 
                 buttonLayout.addView(changeLogButton)
             }
-        } catch (e: Throwable) {
-            PluginManager.logger.error(e)
         }
-        val verid = generateViewId()
-        tv.id = verid
         layout.addView(tv)
         with(ConstraintSet()) {
             clone(layout)
@@ -116,11 +113,12 @@ internal class UpdaterPluginCard(context: Context, plugin: String, forceUpdate: 
                     }
                 }
             }
+            layoutParams = GridLayout.LayoutParams(GridLayout.spec(0), GridLayout.spec(1)).apply {
+                setGravity(Gravity.CENTER_VERTICAL)
+            }
         }
 
-        val updateParams = GridLayout.LayoutParams(GridLayout.spec(0), GridLayout.spec(1))
-        updateParams.setGravity(Gravity.CENTER_VERTICAL)
-        buttonLayout.addView(update, updateParams)
+        buttonLayout.addView(update)
         layout.addView(buttonLayout)
 
         with(ConstraintSet()) {

@@ -1,7 +1,7 @@
 [versions]
 #noinspection GradleDependency
-kotlin = "1.9.10"
-android-gradle = "8.1.2"
+kotlin = "1.8.20"
+android-gradle = "8.2.0"
 #noinspection GradleDependency causes errors
 appcompat = "1.4.1"
 dokka = "1.8.10"
@@ -32,4 +32,3 @@ jadx-dex-input = { module = "com.aliucord.jadx:jadx-dex-input", version.ref = "j
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "android-gradle" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-compatibility = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.13.2" }

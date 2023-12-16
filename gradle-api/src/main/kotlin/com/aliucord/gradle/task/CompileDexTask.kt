@@ -78,22 +78,22 @@ abstract class CompileDexTask : DefaultTask() {
                         val classNode = ClassNode()
                         reader.accept(classNode, 0)
 
-                        // for (annotation in classNode.visibleAnnotations.orEmpty() + classNode.invisibleAnnotations.orEmpty()) {
-                        //     if (annotation.desc == "Lcom/aliucord/annotations/AliucordPlugin;") {
-                        //         requireNotNull(aliucord.pluginClassName) {
-                        //             "Only 1 active plugin class per project is supported"
-                        //         }
-                        //
-                        //         for (method in classNode.methods) {
-                        //             if (method.name == "getManifest" && method.desc == "()Lcom/aliucord/entities/Plugin\$Manifest;") {
-                        //                 throw IllegalArgumentException("Plugin class cannot override getManifest, use manifest.json system!")
-                        //             }
-                        //         }
-                        //
-                        //         aliucord.pluginClassName = classNode.name.replace('/', '.')
-                        //             .also { pluginClassFile.asFile.orNull?.writeText(it) }
-                        //     }
-                        // }
+                        for (annotation in classNode.visibleAnnotations.orEmpty() + classNode.invisibleAnnotations.orEmpty()) {
+                            if (annotation.desc == "Lcom/aliucord/annotations/AliucordPlugin;") {
+                                requireNotNull(aliucord.pluginClassName) {
+                                    "Only 1 active plugin class per project is supported"
+                                }
+
+                                for (method in classNode.methods) {
+                                    if (method.name == "getManifest" && method.desc == "()Lcom/aliucord/entities/Plugin\$Manifest;") {
+                                        throw IllegalArgumentException("Plugin class cannot override getManifest, use manifest.json system!")
+                                    }
+                                }
+
+                                aliucord.pluginClassName = classNode.name.replace('/', '.')
+                                    .also { pluginClassFile.asFile.orNull?.writeText(it) }
+                            }
+                        }
                     }
                 }
         }

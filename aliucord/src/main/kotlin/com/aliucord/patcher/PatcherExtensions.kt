@@ -44,8 +44,8 @@ public inline fun <reified T> PatcherAPI.instead(
     vararg paramTypes: Class<*>,
     crossinline callback: InsteadHookCallback<T>
 ): Runnable = patch(
-    T::class.java.getDeclaredMethod(methodName, *paramTypes),
-    PreHook { param ->
+    m = T::class.java.getDeclaredMethod(methodName, *paramTypes),
+    hook = PreHook { param ->
         try {
             param.result = callback(param.thisObject as T, param)
         } catch (th: Throwable) {

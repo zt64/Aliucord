@@ -173,7 +173,8 @@ public class SettingsAPI internal constructor(plugin: String) {
         is Boolean -> getBool(key, defValue)
         is Long -> getLong(key, defValue)
         is Float -> getFloat(key, defValue)
-        else -> if (defValue is Int) getInt(key, defValue) else getObject(key, defValue)
+        is Int -> getInt(key, defValue)
+        else -> getObject(key, defValue)
     }
 
     /**

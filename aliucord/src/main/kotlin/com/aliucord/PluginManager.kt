@@ -18,6 +18,7 @@ import com.aliucord.utils.MapUtils
 import dalvik.system.PathClassLoader
 import java.io.File
 import java.io.InputStreamReader
+import kotlin.system.measureTimeMillis
 
 /** Aliucord's Plugin Manager  */
 @Suppress("unused")
@@ -51,8 +52,7 @@ public object PluginManager {
 
         try {
             val loader = PathClassLoader(file.absolutePath, context.classLoader)
-            var manifest: Plugin.Manifest
-            loader.getResourceAsStream("manifest.json").use { stream ->
+            val manifest = loader.getResourceAsStream("manifest.json").use { stream ->
                 if (stream == null) {
                     failedToLoad[file] = "No manifest found"
                     logger.error("Failed to load plugin $fileName: No manifest found")
@@ -60,7 +60,7 @@ public object PluginManager {
                 }
 
                 InputStreamReader(stream).use { reader ->
-                    manifest = gson.fromJson(reader, Plugin.Manifest::class.java)
+                    gson.fromJson(reader, Plugin.Manifest::class.java)
                 }
             }
             val name = manifest.name
@@ -77,12 +77,14 @@ public object PluginManager {
                         logger.error(e)
                     }
                 }
-                )
-            val pluginInstance = pluginClass.getDeclaredConstructor().newInstance()
+            )
+
             if (name in plugins) {
                 logger.error("Plugin with name $name already exists")
                 return
             }
+
+            val pluginInstance = pluginClass.getDeclaredConstructor().newInstance()
             pluginInstance.__filename = fileName
             if (pluginInstance.needsResources) {
                 // based on https://stackoverflow.com/questions/7483568/dynamic-resource-loading-from-other-apk
@@ -185,9 +187,10 @@ public object PluginManager {
         logger.info("Starting plugin: $name")
 
         try {
-            val startTime = System.currentTimeMillis()
-            plugins[name]!!.start(appContext)
-            logger.info("Started plugin: $name in ${System.currentTimeMillis() - startTime} milliseconds")
+            val millis = measureTimeMillis {
+                plugins[name]!!.start(appContext)
+            }
+            logger.info("Started plugin: $name in $millis milliseconds")
         } catch (e: Throwable) {
             logger.error("Exception while starting plugin: $name", e)
         }

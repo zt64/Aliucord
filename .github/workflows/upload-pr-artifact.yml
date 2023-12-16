@@ -28,7 +28,6 @@ jobs:
 
       - name: Build Zeetcord
         run: |
-          cd $GITHUB_WORKSPACE
           ./gradlew :aliucord:make
 
       - name: Upload artifact

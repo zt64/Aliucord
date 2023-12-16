@@ -350,25 +350,23 @@ public object Main {
     private fun loadUserPlugins(context: Context) {
         val dir = File(Constants.PLUGINS_PATH)
 
-        if (!dir.exists()) {
-            val res = dir.mkdirs()
-
-            if (!res) {
-                return logger.error("Failed to create directories!")
-            }
+        if (!dir.exists() && dir.mkdirs()) {
+            return logger.error("Failed to create directories!")
         }
 
-        dir
+        val a = dir
             .listFiles { f -> f.extension == "zip" }
             ?.sorted()
-            ?.forEach {
-                try {
-                    loadPlugin(context, it)
-                } catch (e: Throwable) {
-                    logger.error("Failed to load plugin: ${it.name}", e)
+            ?.map {
+                Utils.threadPool.submit {
+                    try {
+                        loadPlugin(context, it)
+                    } catch (e: Throwable) {
+                        logger.error("Failed to load plugin: ${it.name}", e)
+                    }
                 }
             }
-
+        Utils.threadPool.invokeAll(a)
         if (PluginManager.failedToLoad.isNotEmpty()) {
             showToast("Some plugins failed to load. Check the plugins page for more info.")
         }

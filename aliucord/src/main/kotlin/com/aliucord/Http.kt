@@ -17,7 +17,6 @@ import com.aliucord.utils.IOUtils.readBytes
 import com.aliucord.utils.RNSuperProperties
 import com.aliucord.utils.RNSuperProperties.superPropertiesBase64
 import com.discord.utilities.analytics.AnalyticSuperProperties
-import com.discord.utilities.rest.RestAPI.AppHeadersProvider
 import com.google.gson.Gson
 import java.io.*
 import java.lang.reflect.Type
@@ -26,6 +25,7 @@ import java.net.*
 import java.nio.charset.StandardCharsets
 import java.security.*
 import java.util.*
+import com.discord.utilities.rest.RestAPI.AppHeadersProvider.INSTANCE as headersProvider
 
 /** Http Utilities  */
 @Suppress("unused")
@@ -240,13 +240,20 @@ public object Http {
          */
         @Throws(IOException::class)
         public fun appendFile(fieldName: String, uploadFile: File): MultiPartBuilder = apply {
-            append(PREFIX).append(boundary).lineFeed()
-            append("Content-Disposition: form-data; name=\"").append(fieldName)
-                .append("\"; filename=\"").append(uploadFile.getName()).append("\"")
-                .lineFeed()
-            append("Content-Type: ").append(URLConnection.guessContentTypeFromName(uploadFile.getName()))
-                .lineFeed()
-            append("Content-Transfer-Encoding: binary").lineFeed()
+            append(PREFIX)
+            append(boundary)
+            lineFeed()
+            append("Content-Disposition: form-data; name=\"")
+            append(fieldName)
+            append("\"; filename=\"")
+            append(uploadFile.name)
+            append("\"")
+            lineFeed()
+            append("Content-Type: ")
+            append(URLConnection.guessContentTypeFromName(uploadFile.getName()))
+            lineFeed()
+            append("Content-Transfer-Encoding: binary")
+            lineFeed()
             lineFeed()
             outputStream.flush()
             FileInputStream(uploadFile).use { inputStream -> pipe(inputStream, outputStream) }
@@ -263,10 +270,15 @@ public object Http {
          */
         @Throws(IOException::class)
         public fun appendStream(fieldName: String, `is`: InputStream): MultiPartBuilder = apply {
-            append(PREFIX).append(boundary).lineFeed()
-            append("Content-Disposition: form-data; name=\"").append(fieldName).append("\"")
-                .lineFeed()
-            append("Content-Transfer-Encoding: binary").lineFeed()
+            append(PREFIX)
+            append(boundary)
+            lineFeed()
+            append("Content-Disposition: form-data; name=\"")
+            append(fieldName)
+            append("\"")
+            lineFeed()
+            append("Content-Transfer-Encoding: binary")
+            lineFeed()
             lineFeed()
             outputStream.flush()
             pipe(`is`, outputStream)
@@ -283,11 +295,16 @@ public object Http {
          */
         @Throws(IOException::class)
         public fun appendField(fieldName: String, value: String): MultiPartBuilder = apply {
-            append(PREFIX).append(boundary).lineFeed()
-            append("Content-Disposition: form-data; name=\"").append(fieldName).append("\"")
-                .lineFeed()
+            append(PREFIX)
+            append(boundary)
             lineFeed()
-            append(value).lineFeed()
+            append("Content-Disposition: form-data; name=\"")
+            append(fieldName)
+            append("\"")
+            lineFeed()
+            lineFeed()
+            append(value)
+            lineFeed()
             outputStream.flush()
         }
 
@@ -308,7 +325,8 @@ public object Http {
             private const val LINE_FEED = "\r\n"
             private const val PREFIX = "--"
 
-            fun MultiPartBuilder.lineFeed() = append(LINE_FEED)
+            @Suppress("NOTHING_TO_INLINE")
+            inline fun MultiPartBuilder.lineFeed() = append(LINE_FEED)
         }
     }
 
@@ -517,7 +535,6 @@ public object Http {
             @Throws(IOException::class)
             public fun newDiscordRequest(route: String, method: String = "GET"): Request {
                 return Request(getDiscordRoute(route), method).apply {
-                    val headersProvider = AppHeadersProvider.INSTANCE
                     setHeader("User-Agent", headersProvider.userAgent)
                     setHeader(
                         "X-Super-Properties",
@@ -554,7 +571,6 @@ public object Http {
             @Throws(IOException::class)
             public fun newDiscordRNRequest(route: String, method: String = "GET"): Request {
                 return Request(getDiscordRoute(route), method).apply {
-                    val headersProvider = AppHeadersProvider.INSTANCE
                     setHeader("User-Agent", RNSuperProperties.USER_AGENT)
                     setHeader("X-Super-Properties", superPropertiesBase64)
                     setHeader("Accept-Language", headersProvider.acceptLanguages)
@@ -652,7 +668,7 @@ public object Http {
          * @param os The OutputStream to pipe into
          */
         @Throws(IOException::class)
-        public fun pipe(os: OutputStream?): Unit = stream().use { `is` -> pipe(`is`, os!!) }
+        public fun pipe(os: OutputStream?): Unit = stream().use { pipe(it, os!!) }
 
         /**
          * Saves the received data to the specified [File]
@@ -679,7 +695,7 @@ public object Http {
                 val md = if (shouldVerify) MessageDigest.getInstance("SHA-1") else null
                 try {
                     if (shouldVerify) DigestInputStream(stream(), md) else stream().use { `is` ->
-                        FileOutputStream(tempFile).use { os ->
+                        tempFile.outputStream().use { os ->
                             pipe(`is`, os)
                             if (shouldVerify) {
                                 val hash = String.format("%040x", BigInteger(1, md!!.digest()))

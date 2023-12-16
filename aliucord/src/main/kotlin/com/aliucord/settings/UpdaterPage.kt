@@ -104,7 +104,7 @@ internal class UpdaterPage : SettingsPage() {
             item.isEnabled = false
             setActionBarSubtitle("Checking for updates...")
             Utils.threadPool.execute {
-                PluginUpdater.cache.clear()
+                PluginUpdater.clearCache()
                 PluginUpdater.checkUpdates(false)
                 stateText = if (PluginUpdater.updates.isEmpty()) {
                     "No updates found"

@@ -17,7 +17,7 @@ class AndroidLibraryPlugin : Plugin<Project> {
 
             group = "com.aliucord"
 
-            extensions.getByName<LibraryExtension>("android").apply {
+            extensions.configure<LibraryExtension> {
                 namespace = "com.aliucord"
                 compileSdk = 34
 

@@ -17,8 +17,12 @@ gradlePlugin {
 
 dependencies {
     compileOnlyApi("com.google.guava:guava:32.1.3-jre")
-    compileOnlyApi("com.android.tools:sdk-common:31.1.2")
+    compileOnlyApi("com.android.tools:sdk-common:31.2.0")
     compileOnlyApi("com.android.tools.build:gradle:${libs.versions.android.gradle.get()}")
+    implementation("com.aliucord:axml:1.0.1")
+
+    implementation(gradleApi())
+    implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
 
     api(libs.dex.translator)
     api(libs.jadx.core)

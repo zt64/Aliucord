@@ -218,9 +218,7 @@ public class SettingsUtilsJSON(plugin: String) {
     @Suppress("UNCHECKED_CAST")
     public fun <T> getObject(key: String, defValue: T, type: Type?): T {
         val cached = cache[key]
-        if (cached != null) {
-            runCatching { return cached as T }
-        }
+        if (cached != null) runCatching { return cached as T }
         val t: T? = if (settings.has(key)) gson.fromJson(settings.getString(key), type) else null
         return t ?: defValue
     }

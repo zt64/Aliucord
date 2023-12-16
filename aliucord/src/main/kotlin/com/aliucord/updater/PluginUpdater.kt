@@ -24,7 +24,7 @@ internal object PluginUpdater {
     val logger = Logger("Updater")
 
     // Synchronized to avoid ConcurrentModificationException
-    val cache: MutableMap<String?, CachedData> = Collections.synchronizedMap(hashMapOf<String?, CachedData>())
+    private val cache: MutableMap<String?, CachedData> = Collections.synchronizedMap(hashMapOf<String?, CachedData>())
     private val updated: MutableMap<String, String?> = Collections.synchronizedMap(hashMapOf<String, String?>())
     val updates: MutableList<String> = Collections.synchronizedList(arrayListOf())
     private val resType = TypeToken.getParameterized(
@@ -63,22 +63,16 @@ internal object PluginUpdater {
             "Updates for plugins are available: $updatablePlugins"
         } else "All plugins up to date!"
 
-        when {
-            !Updater.usingDexFromStorage() -> {
-                when {
-                    Updater.isAliucordOutdated() -> {
-                        body = if (Main.settings.getBool(AUTO_UPDATE_ALIUCORD_KEY, false)) {
-                            try {
-                                Updater.updateAliucord(Utils.appActivity)
-                                "Auto updated Aliucord. Please restart Aliucord to load the update - $body"
-                            } catch (th: Throwable) {
-                                "Failed to auto update Aliucord. Please update it manually - $body"
-                            }
-                        } else {
-                            "Your Aliucord is outdated. Please update it to the latest version - $body"
-                        }
-                    }
+        if (Updater.isAliucordOutdated() && !Updater.usingDexFromStorage()) {
+            body = if (Main.settings.getBool(AUTO_UPDATE_ALIUCORD_KEY, false)) {
+                try {
+                    Updater.updateAliucord(Utils.appActivity)
+                    "Auto updated Aliucord. Please restart Aliucord to load the update - $body"
+                } catch (th: Throwable) {
+                    "Failed to auto update Aliucord. Please update it manually - $body"
                 }
+            } else {
+                "Your Aliucord is outdated. Please update it to the latest version - $body"
             }
         }
 
@@ -156,15 +150,15 @@ internal object PluginUpdater {
     fun updateAll(): Int {
         var updateCount = 0
 
-        updates.forEach { plugin ->
+        updates.count { plugin ->
             try {
-                if (update(plugin) && updateCount != -1) updateCount++
+                update(plugin)
             } catch (t: Throwable) {
                 logger.error("Error while updating plugin $plugin", t)
-                updateCount = -1
+                false
             }
         }
-        updates.clear()
+
         checkUpdates(false)
         return updateCount
     }
@@ -194,6 +188,10 @@ internal object PluginUpdater {
         return true
     }
 
+    fun clearCache() {
+        cache.clear()
+    }
+
     private fun addDefaultInfo(updateInfo: UpdateInfo, defaultInfo: UpdateInfo?) {
         if (defaultInfo == null) return
 
@@ -213,7 +211,7 @@ internal object PluginUpdater {
         var sha1sum: String? = null
     }
 
-    class CachedData(var data: Map<String, UpdateInfo>) {
+    private class CachedData(var data: Map<String, UpdateInfo>) {
         var time = System.currentTimeMillis()
     }
 }

@@ -39,7 +39,7 @@ internal class FilterAdapter(fragment: AppFragment) : RecyclerView.Adapter<Filte
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.item.type = FilterType.entries[position]
+        holder.item.type = FilterType.values()[position]
         when (holder.item.type) {
             FilterType.AUTHOR -> Utils.threadPool.execute {
                 developers = PluginRepoAPI.developers.toMutableList()
