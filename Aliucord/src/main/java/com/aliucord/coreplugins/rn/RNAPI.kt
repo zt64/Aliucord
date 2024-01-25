@@ -32,6 +32,7 @@ internal class RNAPI : CorePlugin(Manifest("RNAPI")) {
         patchStickers()
         patchVoice()
         fixPersisters()
+        patchSettings()
     }
 
     override fun start(context: Context?) {}

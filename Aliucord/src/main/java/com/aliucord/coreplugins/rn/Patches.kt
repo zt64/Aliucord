@@ -4,21 +4,32 @@
  * Licensed under the Open Software License version 3.0
  */
 
+@file:Suppress("MISSING_DEPENDENCY_SUPERCLASS")
+
 package com.aliucord.coreplugins.rn
 
 import android.content.Context
 import android.view.View
 import com.aliucord.api.rn.channel.RNChannel
 import com.aliucord.api.rn.models.message.RNMessage
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
+import com.aliucord.Utils
 import com.aliucord.api.rn.user.RNUser
 import com.aliucord.api.rn.user.RNUserProfile
 import com.aliucord.patcher.*
+import com.aliucord.utils.DimenUtils.dp
 import com.aliucord.utils.RNSuperProperties
+import com.aliucord.views.TextInput
 import com.discord.api.channel.Channel
 import com.discord.api.channel.`ChannelUtils$getDisplayName$1`
 import com.discord.api.sticker.Sticker
 import com.discord.api.sticker.StickerFormatType
 import com.discord.api.sticker.StickerPartial
+import com.discord.api.user.PatchUserBody
 import com.discord.api.user.User
 import com.discord.api.user.UserProfile
 import com.discord.app.AppFragment
@@ -29,8 +40,11 @@ import com.discord.models.user.MeUser
 import com.discord.stores.*
 import com.discord.utilities.auth.`AuthUtils$createDiscriminatorInputValidator$1`
 import com.discord.utilities.icon.IconUtils
+import com.discord.utilities.rest.RestAPI
 import com.discord.utilities.persister.Persister
 import com.discord.utilities.user.UserUtils
+import com.discord.widgets.settings.profile.SettingsUserProfileViewModel
+import com.discord.widgets.settings.profile.WidgetEditUserOrGuildMemberProfile
 import com.discord.widgets.settings.account.WidgetSettingsAccountUsernameEdit
 import com.discord.widgets.user.UserNameFormatterKt
 import com.discord.widgets.user.WidgetUserPasswordVerify
@@ -39,6 +53,7 @@ import com.discord.widgets.user.profile.UserProfileHeaderViewModel
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
+import com.lytefast.flexinput.R
 import de.robv.android.xposed.XC_MethodHook
 import okhttp3.*
 import rx.Observable
@@ -178,6 +193,75 @@ fun patchUsername() {
 
     Patcher.addPatch(WidgetUserPasswordVerify::class.java.getDeclaredMethod("updateAccountInfo", String::class.java), PreHook {
         (it.thisObject as AppFragment).mostRecentIntent.removeExtra("INTENT_EXTRA_DISCRIMINATOR")
+    })
+}
+
+fun patchSettings() {
+    val displayNameId = View.generateViewId()
+    val pronounsId = View.generateViewId()
+
+    Patcher.addPatch(WidgetEditUserOrGuildMemberProfile::class.java.getDeclaredMethod("onViewBound", View::class.java), Hook {
+        val binding = WidgetEditUserOrGuildMemberProfile.`access$getBinding$p`(it.thisObject as WidgetEditUserOrGuildMemberProfile)
+        val context = binding.root.context
+        val parent = Utils.nestedChildAt<LinearLayout>(binding.a, 1, 0)
+
+        parent.addView(TextView(context, null, 0, R.i.UserProfile_Section_Header).apply {
+            setPadding(16.dp, 0.dp, 16.dp, 0.dp)
+            text = "Display Name"
+        }, 2)
+        parent.addView(TextInput(context).apply {
+            id = displayNameId
+            setPadding(16.dp, 0.dp, 16.dp, 0.dp)
+            layout.apply {
+                isCounterEnabled = true
+                counterMaxLength = 32
+            }
+        }, 3)
+        parent.addView(TextView(context, null, 0, R.i.UserProfile_Section_Header).apply {
+            setPadding(16.dp, 0.dp, 16.dp, 0.dp)
+            text = "Pronouns"
+        },4)
+        parent.addView(TextInput(context).apply {
+            id = pronounsId
+            setPadding(16.dp, 0.dp, 16.dp, 0.dp)
+            layout.apply {
+                isCounterEnabled = true
+                counterMaxLength = 40
+            }
+        }, 5)
+    })
+
+    val api = RestAPI.api
+    api.patchUser(PatchUserBody())
+    Patcher.addPatch(WidgetEditUserOrGuildMemberProfile::class.java.getDeclaredMethod("configureUI", SettingsUserProfileViewModel.ViewState::class.java), Hook {
+        val state = it.args[0] as SettingsUserProfileViewModel.ViewState
+
+        if (state !is SettingsUserProfileViewModel.ViewState.Loaded) return@Hook
+
+        val binding = WidgetEditUserOrGuildMemberProfile.`access$getBinding$p`(it.thisObject as WidgetEditUserOrGuildMemberProfile)
+
+        val displayName = binding.a.findViewById<TextInput>(displayNameId)
+
+        displayName.layout.placeholderText = state.user.username
+        displayName.editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+        })
+        val pronouns = binding.a.findViewById<TextInput>(pronounsId)
+
+        pronouns.editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+        })
     })
 }
 
