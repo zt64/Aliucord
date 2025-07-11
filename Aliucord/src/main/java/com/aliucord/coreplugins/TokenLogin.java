@@ -6,7 +6,6 @@
 
 package com.aliucord.coreplugins;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -29,7 +28,8 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.lytefast.flexinput.R;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import kotlin.Unit;
 
@@ -78,7 +78,6 @@ public final class TokenLogin extends CorePlugin {
     }
 
     @Override
-    @SuppressLint("SetTextI18n")
     public void start(Context appContext) throws Throwable {
         Patcher.addPatch(WidgetAuthLanding.class.getDeclaredMethod("onViewBound", View.class), new Hook(param -> {
             Context context = ((WidgetAuthLanding) param.thisObject).requireContext();
